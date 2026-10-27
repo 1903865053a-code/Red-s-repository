@@ -47,6 +47,9 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 .onb-blk.on{background:var(--accent-soft);border:1px solid var(--accent)}
 .onb-blk.g{background:var(--green-soft);border:1px solid #BFDCCC}
 .onb-cap{font-size:11px;color:var(--ink3);margin-top:8px}
+.onb-points{display:flex;flex-direction:column;gap:9px;margin-bottom:20px}
+.onb-points div{display:flex;gap:8px;font-size:13px;color:var(--ink2);line-height:1.45}
+.onb-points b{color:var(--green);flex:none;font-weight:700}
 .onb .spacer{flex:1}
 .primary{
   width:100%;background:var(--accent);color:#fff;border-radius:14px;padding:15px;
@@ -107,6 +110,20 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 .zoomer{display:flex;align-items:center;gap:2px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:1px}
 .zoomer button{width:26px;height:23px;display:grid;place-items:center;font-size:14px;color:var(--ink2);border-radius:7px}
 .zoomer button:active{background:#F1EBE2}
+
+/* 工作日日期 chip */
+.dchips{display:flex;gap:5px;margin-bottom:8px}
+.dchip{
+  flex:1;background:#fff;border:1px solid var(--line);border-radius:11px;
+  padding:5px 2px 7px;display:flex;flex-direction:column;align-items:center;gap:0;
+  position:relative;transition:all .12s;
+}
+.dchip span{font-size:9.5px;color:var(--ink3);line-height:1.3}
+.dchip b{font-size:14px;font-weight:700;line-height:1.15;font-variant-numeric:tabular-nums}
+.dchip i{width:4px;height:4px;border-radius:50%;background:var(--accent);position:absolute;bottom:3px;display:block}
+.dchip.on{background:var(--accent-soft);border-color:var(--accent)}
+.dchip.on span,.dchip.on b{color:#B4462B}
+.dchip.today span{color:var(--accent);font-weight:700}
 
 /* ================= 日历 ================= */
 .cal{position:relative;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 2px 10px -6px rgba(42,38,34,.12)}
@@ -383,6 +400,7 @@ let ui = {
   draft: null,
   joinDraft: null,
   sel: null,
+  eveDate: null,
   onbStep: "welcome",
   onbDraft: null
 };
@@ -417,14 +435,27 @@ function actById(id){ return state.activities.find(a=>a.id===id); }
 
 /* ---------------- 时间与环节 ---------------- */
 function dayRange(){ return ui.view === "evening" ? [EVE_MIN, DAY_MAX] : [DAY_MIN, DAY_MAX]; }
-function dayList(){ return ui.view === "evening" ? weekdayDates() : weekendDates(); }
+function eveDays(){ return weekdayDates(); }
+function activeEveDay(){
+  const wd = eveDays();
+  if(ui.eveDate) return wd.find(d=>ymd(d)===ui.eveDate) || wd[0];
+  const hasAct = d => activities().some(a=>a.date===ymd(d));
+  const today = wd.find(d=>isToday(d));
+  if(today && hasAct(today)) return today;
+  return wd.find(hasAct) || today || wd[0];
+}
+function dayList(){
+  if(ui.view === "evening") return [activeEveDay()];
+  return weekendDates();
+}
 
 function partsOf(a){
   const out = [];
   BANDS.forEach(b=>{
     const s = Math.max(b.s, a.start);
     const e = Math.min(b.e, a.end);
-    if(e - s >= SNAP) out.push({ id:b.id, name:b.name, start:s, end:e, kind:b.kind });
+    /* 太短的边角（比如活动只蹭到晚饭 15 分钟）不算一个环节 */
+    if(e - s >= 45) out.push({ id:b.id, name:b.name, start:s, end:e, kind:b.kind });
   });
   return out;
 }
@@ -465,6 +496,11 @@ function renderWelcome(){
       '<div class="onb-row"><div class="onb-blk"></div><div class="onb-blk g"></div><div class="onb-blk"></div></div>'+
       '<div class="onb-row"><div class="onb-blk g"></div><div class="onb-blk"></div><div class="onb-blk"></div></div>'+
       '<div class="onb-cap">上午 · 午饭 · 下午 · 晚饭 · 晚上 · 夜宵</div>'+
+    '</div>'+
+    '<div class="onb-points">'+
+      '<div><b>✓</b><span>不用在群里刷屏接龙，也不会被折叠</span></div>'+
+      '<div><b>✓</b><span>一个活动可以只参加其中某几段</span></div>'+
+      '<div><b>✓</b><span>谁去、谁还在犹豫、谁还没回，一眼看清</span></div>'+
     '</div>'+
     '<div class="spacer"></div>'+
     '<button class="primary" data-action="onb-create">创建一个群组</button>'+
@@ -524,6 +560,7 @@ function renderApp(){
   return '<div class="screen">'+
     renderTopbar()+
     renderViewTabs()+
+    renderDayChips()+
     renderCalendar()+
     '<div class="footer-note">演示版 · 数据只存在这台设备的浏览器里<br>'+
     '<button data-action="reset">重置演示</button></div>'+
@@ -545,7 +582,7 @@ function renderTopbar(){
 }
 
 function renderViewTabs(){
-  const range = ui.view==="evening" ? "周一至周五 · 17:00 以后" : rangeLabel();
+  const range = ui.view==="evening" ? "17:00 以后" : rangeLabel();
   return '<div class="vtabs">'+
     '<button class="'+(ui.view==="weekend"?"on":"")+'" data-action="view" data-v="weekend">周末</button>'+
     '<button class="'+(ui.view==="evening"?"on":"")+'" data-action="view" data-v="evening">工作日晚上</button>'+
@@ -553,6 +590,25 @@ function renderViewTabs(){
   '<div class="vmeta"><span class="range">'+range+'</span>'+
   '<div class="zoomer"><button data-action="zoom" data-d="-1">−</button><button data-action="zoom" data-d="1">＋</button></div>'+
   '</div>';
+}
+
+/* 工作日：周一至周五的日期 chip */
+function renderDayChips(){
+  if(ui.view !== "evening") return "";
+  const wd = eveDays();
+  const active = ymd(activeEveDay());
+  let h = '<div class="dchips">';
+  wd.forEach(d=>{
+    const k = ymd(d);
+    const has = activities().some(a=>a.date===k);
+    h += '<button class="dchip '+(k===active?"on":"")+(isToday(d)?" today":"")+'" data-action="pick-eve-day" data-date="'+k+'">'+
+      '<span>'+WEEK_CN[d.getDay()].replace("周","")+'</span>'+
+      '<b>'+d.getDate()+'</b>'+
+      (has?'<i></i>':'')+
+    '</button>';
+  });
+  h += '</div>';
+  return h;
 }
 
 function rangeLabel(){
@@ -574,18 +630,20 @@ function renderCalendar(){
   const pxh = pxPerHour();
   const bodyH = Math.round(totalMin/60*pxh);
   const gutter = 46;
-  const isScroll = ui.view === "evening";
+  const isScroll = false;
   const avail = Math.min(492, window.innerWidth - 28) - gutter;
   const colW = isScroll ? Math.max(138, Math.floor((avail - 2)/3)) : 0;
   const innerW = isScroll ? gutter + colW*days.length : 0;
 
   let h = '<div class="cal" data-scroll="'+(isScroll?"1":"0")+'"><div class="cal-scroll"><div class="cal-inner"'+(isScroll?' style="width:'+innerW+'px"':'')+'>';
-  h += '<div class="cal-head"><div class="cal-corner"></div>';
-  days.forEach(d=>{
-    h += '<div class="cal-dayhead '+(isToday(d)?"today":"")+'"'+(isScroll?' style="width:'+colW+'px"':'')+'>'+
-         '<b>'+WEEK_CN[d.getDay()].replace("周","")+'</b><span>'+(isToday(d)?"今天":fmtMD(d))+'</span></div>';
-  });
-  h += '</div>';
+  if(days.length > 1){
+    h += '<div class="cal-head"><div class="cal-corner"></div>';
+    days.forEach(d=>{
+      h += '<div class="cal-dayhead '+(isToday(d)?"today":"")+'"'+(isScroll?' style="width:'+colW+'px"':'')+'>'+
+           '<b>'+WEEK_CN[d.getDay()].replace("周","")+'</b><span>'+(isToday(d)?"今天":fmtMD(d))+'</span></div>';
+    });
+    h += '</div>';
+  }
 
   h += '<div class="cal-body" style="height:'+bodyH+'px">';
   h += '<div class="gutter" style="height:'+bodyH+'px">';
@@ -966,6 +1024,7 @@ document.addEventListener("click", (e)=>{
   if(a==="new-group"){ closeSheet(); state.onboarded=false; ui.onbStep="create"; ui.onbDraft=null; render(); return; }
 
   if(a==="view"){ ui.view = el.dataset.v; ui.sel=null; render(); return; }
+  if(a==="pick-eve-day"){ ui.eveDate = el.dataset.date; ui.sel=null; render(); return; }
   if(a==="zoom"){
     const d = +el.dataset.d;
     ui.zoom = Math.min(2, Math.max(0.7, Math.round((ui.zoom + d*0.15)*100)/100));
@@ -1150,7 +1209,13 @@ document.addEventListener("pointerup", ()=>{
   if(!dragCtx) return;
   const ctx = dragCtx;
   dragCtx = null;
-  if(!ctx.moved) return;
+  if(!ctx.moved){
+    /* 轻点一下：吸附到整点/半点，默认选中 1 小时 */
+    const m = Math.round(ctx.a / 30) * 30;
+    ui.sel = { date: ctx.date, a: m, b: Math.min(DAY_MAX, m + 60) };
+    render();
+    return;
+  }
   const a = Math.min(ui.sel.a, ui.sel.b), b = Math.max(ui.sel.a, ui.sel.b);
   if(b - a < SNAP) ui.sel = { date: ctx.date, a:ctx.a, b:Math.min(DAY_MAX, ctx.a + SNAP) };
   render();
