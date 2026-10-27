@@ -148,7 +148,7 @@ input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 .g-band[data-kind="night"]{color:#7E7BA6}
 .g-band[data-kind="late"]{color:#BDB5A9}
 
-.daycol{position:relative;flex:1;min-width:0;border-right:1px solid #F3EDE4;touch-action:none;user-select:none}
+.daycol{position:relative;flex:1;min-width:0;border-right:1px solid #F3EDE4;touch-action:pan-y;user-select:none;-webkit-touch-callout:none}
 .cal[data-scroll="1"] .daycol{flex:none}
 .daycol:last-child{border-right:none}
 .band{position:absolute;left:0;right:0;pointer-events:none}
@@ -682,7 +682,7 @@ function renderCalendar(){
       if(nowMin>=rMin && nowMin<=rMax) h += '<div class="nowline" style="top:'+((nowMin-rMin)/totalMin*100)+'%"></div>';
     }
     dayActs.forEach(a=>{ h += renderCard(a, lanes, rMin, rMax); });
-    if(!dayActs.length && di===0) h += '<div class="emptyhint">按住拖动<br>选个时间</div>';
+    if(!dayActs.length && di===0) h += '<div class="emptyhint">长按拖动选时段<br>轻点选 1 小时</div>';
 
     if(ui.sel && ui.sel.date===key){
       const s = Math.min(ui.sel.a, ui.sel.b), e = Math.max(ui.sel.a, ui.sel.b);
@@ -1181,7 +1181,80 @@ function paintSelection(){
   tag.textContent = fmtTime(s)+"–"+fmtTime(e);
 }
 
+/* 点遮罩关闭抽屉（等于取消，不保存草稿） */
+document.getElementById("scrim").addEventListener("click", ()=>{ closeSheet(); });
+
+/* --- 选时间段：触屏长按后拖动 / 轻点选 1 小时 / 鼠标直接拖 --- */
+let pressTimer = null;
+let touchCtx = null;
+
+function snapTo(m, step){ return Math.round(m/step)*step; }
+
+document.addEventListener("touchstart", (e)=>{
+  if(e.touches.length !== 1) return;
+  const col = e.target.closest(".daycol");
+  if(!col) return;
+  if(e.target.closest(".card")) return;
+
+  const t = e.touches[0];
+  const [rMin, rMax] = dayRange();
+  touchCtx = { col, date: col.dataset.date, x:t.clientX, startY:t.clientY, selecting:false, rMin, rMax, a:0 };
+
+  /* 按住 360ms 才进入选择模式，避免想上下滚动时误选 */
+  pressTimer = setTimeout(()=>{
+    if(!touchCtx || touchCtx.selecting) return;
+    touchCtx.selecting = true;
+    const m = Math.min(snapTo(minuteFromY(touchCtx.startY, col, rMin, rMax), SNAP), DAY_MAX - SNAP);
+    touchCtx.a = m;
+    ui.sel = { date: touchCtx.date, a: m, b: Math.min(DAY_MAX, m + 60) };
+    try{ if(navigator.vibrate) navigator.vibrate(12); }catch(err){}
+    paintSelection();
+    renderBar();
+    toast("按住往下拖，选结束时间");
+  }, 360);
+}, { passive:true });
+
+document.addEventListener("touchmove", (e)=>{
+  if(!touchCtx) return;
+  const t = e.touches[0];
+  if(!touchCtx.selecting){
+    /* 还没进入选择模式就往上下滑了 → 当作滚动，放弃这次选择 */
+    if(Math.abs(t.clientY - touchCtx.startY) > 10 || Math.abs(t.clientX - touchCtx.x) > 10){
+      clearTimeout(pressTimer);
+      touchCtx = null;
+    }
+    return;
+  }
+  e.preventDefault();
+  const m = minuteFromY(t.clientY, touchCtx.col, touchCtx.rMin, touchCtx.rMax);
+  ui.sel = { date: touchCtx.date, a: touchCtx.a, b: m };
+  paintSelection();
+  renderBar();
+}, { passive:false });
+
+document.addEventListener("touchend", ()=>{
+  clearTimeout(pressTimer);
+  if(!touchCtx) return;
+  const ctx = touchCtx;
+  touchCtx = null;
+
+  if(ctx.selecting){
+    const a = Math.min(ui.sel.a, ui.sel.b), b = Math.max(ui.sel.a, ui.sel.b);
+    ui.sel = { date: ctx.date, a, b: Math.max(b, Math.min(DAY_MAX, a + SNAP)) };
+    render();
+    return;
+  }
+  /* 轻点：吸附到整点/半点，默认 1 小时 */
+  const m = Math.min(snapTo(minuteFromY(ctx.startY, ctx.col, ctx.rMin, ctx.rMax), 30), DAY_MAX - 30);
+  ui.sel = { date: ctx.date, a:m, b: Math.min(DAY_MAX, m + 60) };
+  render();
+}, { passive:true });
+
+document.addEventListener("touchcancel", ()=>{ clearTimeout(pressTimer); touchCtx = null; }, { passive:true });
+
+/* 鼠标：按下就选，拖动改结束时间 */
 document.addEventListener("pointerdown", (e)=>{
+  if(e.pointerType && e.pointerType !== "mouse") return;
   const col = e.target.closest(".daycol");
   if(!col) return;
   if(e.target.closest(".card")) return;
@@ -1196,7 +1269,7 @@ document.addEventListener("pointerdown", (e)=>{
 });
 
 document.addEventListener("pointermove", (e)=>{
-  if(!dragCtx) return;
+  if(!dragCtx || (e.pointerType && e.pointerType !== "mouse")) return;
   const m = minuteFromY(e.clientY, dragCtx.col, dragCtx.rMin, dragCtx.rMax);
   if(m !== dragCtx.b) dragCtx.moved = true;
   dragCtx.b = m;
@@ -1205,12 +1278,11 @@ document.addEventListener("pointermove", (e)=>{
   renderBar();
 });
 
-document.addEventListener("pointerup", ()=>{
-  if(!dragCtx) return;
+document.addEventListener("pointerup", (e)=>{
+  if(!dragCtx || (e.pointerType && e.pointerType !== "mouse")) return;
   const ctx = dragCtx;
   dragCtx = null;
   if(!ctx.moved){
-    /* 轻点一下：吸附到整点/半点，默认选中 1 小时 */
     const m = Math.round(ctx.a / 30) * 30;
     ui.sel = { date: ctx.date, a: m, b: Math.min(DAY_MAX, m + 60) };
     render();
