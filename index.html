@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
 <meta name="theme-color" content="#FAF7F2">
 <title>周末活动小助手</title>
 <style>
@@ -15,11 +15,10 @@
   --line:#EAE2D6;
   --accent:#E8674A;
   --accent-soft:#FDEDE8;
-  --green:#3E7C68;
-  --meal:#FFFBF3;
-  --night:#F6F5FB;
-  --late:#F7F7F4;
-  --radius:16px;
+  --green:#2C6B52;
+  --green-soft:#E7F3EC;
+  --amber:#9A6B12;
+  --amber-soft:#FFF4DC;
   --font:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -30,1074 +29,1315 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 button{font-family:inherit;font-size:inherit;color:inherit;border:none;background:none;padding:0;cursor:pointer}
-input{font-family:inherit;font-size:inherit;color:inherit}
+input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 
-.app{max-width:460px;margin:0 auto;padding:0 16px calc(96px + env(safe-area-inset-bottom))}
+.screen{max-width:520px;margin:0 auto;padding:0 14px calc(20px + env(safe-area-inset-bottom));min-height:100dvh}
 
-/* ---------- 顶部 ---------- */
-.topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:20px 0 4px}
-.topbar-left{flex:1;min-width:0}
-.brand{font-size:19px;font-weight:700;letter-spacing:-.2px}
-.brand small{font-weight:500;color:var(--ink3);font-size:12px;margin-left:6px;letter-spacing:0}
-.subline{margin-top:4px;font-size:12.5px;color:var(--ink2);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.group-chip{display:inline-flex;align-items:center;gap:5px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 9px;font-size:12px;color:var(--ink2)}
-.group-chip:active{background:#F3EEE6}
-.me-chip{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 10px 4px 4px;flex:none;box-shadow:0 1px 2px rgba(42,38,34,.04)}
-.me-chip:active{background:#F7F3EC}
-.me-chip .nm{font-size:12.5px;font-weight:600;max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.me-chip .caret{font-size:9px;color:var(--ink3)}
-
-.avatar{
-  width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;
-  font-size:11.5px;font-weight:700;color:#fff;flex:none;letter-spacing:0;
+/* ================= 引导页 ================= */
+.onb{padding:52px 18px 24px;max-width:520px;margin:0 auto;display:flex;flex-direction:column;min-height:100dvh}
+.onb-logo{font-size:52px;line-height:1;margin-bottom:18px}
+.onb h1{font-size:26px;line-height:1.25;margin:0 0 10px;letter-spacing:-.5px}
+.onb .lead{font-size:14px;color:var(--ink2);line-height:1.65;margin:0 0 24px}
+.onb-preview{
+  background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;
+  margin-bottom:26px;box-shadow:0 2px 10px -4px rgba(42,38,34,.08);
 }
-.avatar.sm{width:22px;height:22px;font-size:10.5px}
-
-/* ---------- 提示条 ---------- */
-.hint{
-  display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);
-  border-radius:14px;padding:10px 12px;margin-top:14px;font-size:12.5px;color:var(--ink2);
-  box-shadow:0 1px 3px rgba(42,38,34,.04);line-height:1.45;
+.onb-row{display:flex;gap:6px;margin-bottom:6px}
+.onb-blk{height:16px;border-radius:5px;background:#F1EBE2;flex:1}
+.onb-blk.on{background:var(--accent-soft);border:1px solid var(--accent)}
+.onb-blk.g{background:var(--green-soft);border:1px solid #BFDCCC}
+.onb-cap{font-size:11px;color:var(--ink3);margin-top:8px}
+.onb .spacer{flex:1}
+.primary{
+  width:100%;background:var(--accent);color:#fff;border-radius:14px;padding:15px;
+  font-size:15px;font-weight:700;box-shadow:0 8px 20px -8px rgba(232,103,74,.65);
 }
-.hint b{color:var(--ink);font-weight:600}
-.hint button{flex:none;font-size:12px;color:var(--accent);font-weight:600;padding:4px 6px}
-.pending-note{
-  display:inline-flex;align-items:center;gap:3px;
-  font-size:10.5px;color:#B4462B;background:var(--accent-soft);
-  border-radius:999px;padding:3px 8px;font-weight:600;white-space:nowrap;
+.primary:active{background:#D95B3E}
+.primary:disabled{background:#E5DDD2;color:#A79C90;box-shadow:none}
+.ghost-btn{
+  width:100%;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;
+  font-size:14px;font-weight:650;color:var(--ink2);margin-top:10px;
 }
-.pending-note b{font-weight:800}
-
-/* ---------- 日期 ---------- */
-.day{margin-top:22px}
-.day-head{display:flex;align-items:baseline;gap:8px;margin-bottom:10px;padding-left:2px}
-.day-name{font-size:15px;font-weight:700}
-.day-date{font-size:12.5px;color:var(--ink3);font-variant-numeric:tabular-nums}
-.day-tag{margin-left:auto;font-size:11px;color:var(--ink3);background:#fff;border:1px solid var(--line);border-radius:999px;padding:2px 8px}
-
-/* ---------- 周视图 ---------- */
-.week{margin-top:20px}
-.week-head{display:grid;grid-template-columns:52px 1fr 1fr;gap:8px;align-items:end;padding-bottom:7px}
-.wh-day{display:flex;flex-direction:column;line-height:1.2;min-width:0}
-.wh-day b{font-size:14px;font-weight:700}
-.wh-day span{font-size:10.5px;color:var(--ink3);margin-top:2px;font-variant-numeric:tabular-nums}
-.week-grid{display:grid;grid-template-columns:52px 1fr 1fr;grid-auto-rows:64px;gap:8px;position:relative}
-
-.slot-label{display:flex;flex-direction:column;justify-content:center;padding-right:2px;min-width:0}
-.slot-label .bl{font-size:12.5px;font-weight:650;color:var(--ink2);white-space:nowrap;line-height:1.2}
-.slot-label .bt{font-size:9.5px;color:var(--ink3);font-variant-numeric:tabular-nums;margin-top:3px;white-space:nowrap}
-.slot-label[data-kind="late"] .bl,.slot-label[data-kind="late"] .bt{color:#BDB5A9}
-
-.slot{
-  border-radius:13px;border:1.5px dashed transparent;position:relative;
-  z-index:0;transition:background .14s,border-color .14s,box-shadow .14s;
-}
-.slot[data-kind="meal"]{background:var(--meal)}
-.slot[data-kind="night"]{background:var(--night)}
-.slot[data-kind="late"]{background:var(--late)}
-.slot.free{border-color:#E6DDD0}
-.slot.free::after{
-  content:"+";position:absolute;inset:0;display:grid;place-items:center;
-  font-size:19px;font-weight:300;color:#CFC5B6;
-}
-.slot.free:active{background:#F5EFE5}
-.slot.insel{background:var(--accent-soft);border-color:var(--accent);border-style:solid;box-shadow:0 0 0 3px rgba(232,103,74,.10)}
-.slot.insel::after{color:var(--accent);font-weight:400}
-.slot.taken{background:transparent;border-color:transparent}
-
-/* ---------- 活动卡片 ---------- */
-.act{
-  position:relative;z-index:1;display:flex;flex-direction:column;
-  background:var(--card);border-radius:12px;border:1px solid var(--line);
-  border-left:3px solid var(--c,var(--accent));
-  padding:8px 7px 7px 9px;overflow:hidden;text-align:left;
-  box-shadow:0 1px 2px rgba(42,38,34,.05),0 4px 10px -6px rgba(42,38,34,.16);
-  transition:transform .12s;
-}
-.act:active{transform:scale(.97)}
-.act-top{display:flex;align-items:flex-start;gap:4px;min-width:0;padding-right:11px}
-.act-emoji{font-size:13px;line-height:1.25;flex:none}
-.act-name{
-  font-size:12px;font-weight:700;letter-spacing:-.1px;line-height:1.3;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
-}
-.act-place{margin-top:3px;font-size:10px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.act-bottom{margin-top:auto;padding-top:5px;display:flex;align-items:center;gap:4px}
-.pile{display:flex;align-items:center;min-width:0}
-.pile .avatar{width:18px;height:18px;font-size:9px;border:1.5px solid #fff;margin-left:-5px}
-.pile .avatar:first-child{margin-left:0}
-.pile .more{
-  width:18px;height:18px;border-radius:50%;background:#F1EBE2;color:var(--ink2);
-  display:inline-grid;place-items:center;font-size:8.5px;font-weight:700;border:1.5px solid #fff;margin-left:-5px;
-}
-.st-dot{position:absolute;top:8px;right:8px;width:7px;height:7px;border-radius:50%;flex:none}
-.st-dot.in{background:#2C6B52;box-shadow:0 0 0 2.5px #E7F3EC}
-.st-dot.maybe{background:#D9A93C;box-shadow:0 0 0 2.5px #FFF4DC}
-.act[data-span="1"] .act-place{display:none}
-.act[data-span="1"] .act-name{font-size:11.5px}
-.act-note{
-  margin-top:5px;font-size:10px;color:var(--ink3);line-height:1.45;
-  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
-}
-.mini-segs{margin-top:6px;display:flex;flex-direction:column;gap:2px}
-.mseg{display:flex;align-items:center;gap:3px;font-size:9.5px;color:var(--ink3);line-height:1.3}
-.mseg .ml{flex:1;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mseg .mn{font-weight:700;color:var(--ink2);font-variant-numeric:tabular-nums}
-.mseg .mq{color:#B98A24;font-weight:600}
-.mseg.mi-in .mn{color:#2C6B52}
-.mseg.mi-maybe .mn{color:#9A6B12}
-.act[data-span="1"] .act-note,
-.act[data-span="1"] .mini-segs{display:none}
-
-.act[data-span="1"] .act-sub{display:none}
-.act[data-span="1"] .act-note{display:none}
-.act-segs{margin-top:10px;display:flex;gap:5px;flex-wrap:wrap}
-.seg{display:inline-flex;align-items:center;gap:3px;background:#F6F1E8;border-radius:7px;padding:2px 6px;font-size:10.5px;color:var(--ink3);line-height:1.45;white-space:nowrap}
-.seg .sl{font-weight:600}
-.seg .sn{font-weight:700;color:var(--ink2);font-variant-numeric:tabular-nums}
-.seg .q{color:#B98A24;font-weight:600}
-.seg.mine-in{background:#E7F3EC;color:#2C6B52}
-.seg.mine-in .sn{color:#2C6B52}
-.seg.mine-maybe{background:#FFF4DC;color:#9A6B12}
-.seg.mine-maybe .sn{color:#9A6B12}
-.seg.mine-out{background:#EDE7DD;color:#8A8178}
-.seg.mine-out .sn{color:#8A8178}
-.seg.ghost{background:transparent;border:1px dashed #D9CFBF;color:var(--ink3)}
-.seg.ghost .sn{color:var(--ink3)}
-.act[data-span="1"] .act-segs{display:none}
-.act[data-span="1"] .act-bottom{padding-top:6px}
-.act[data-span="1"] .act-name{font-size:13.5px}
-.act[data-span="1"] .act-emoji{font-size:14px}
-
-/* ---------- 选择浮条 ---------- */
-.selectbar{
-  position:fixed;left:50%;bottom:18px;transform:translate(-50%,calc(100% + 32px));
-  width:calc(100% - 32px);max-width:428px;z-index:40;opacity:0;
-  background:#2A2622;color:#fff;border-radius:16px;padding:11px 12px 11px 16px;
-  display:flex;align-items:center;gap:10px;
-  box-shadow:0 10px 30px -8px rgba(42,38,34,.5);
-  transition:transform .22s cubic-bezier(.2,.8,.3,1),opacity .18s;
-}
-.selectbar.on{transform:translate(-50%,0);opacity:1;pointer-events:auto}
-.selectbar .txt{flex:1;min-width:0}
-.selectbar .t1{font-size:13px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.selectbar .t2{font-size:11px;color:rgba(255,255,255,.55);margin-top:1px}
-.selectbar .go{background:#fff;color:#2A2622;border-radius:11px;padding:8px 14px;font-size:13px;font-weight:700;flex:none}
-.selectbar .go:active{background:#EDE7DE}
-.selectbar .cancel{color:rgba(255,255,255,.6);font-size:13px;padding:6px;flex:none}
-
-/* ---------- 抽屉 ---------- */
-.scrim{
-  position:fixed;inset:0;background:rgba(42,38,34,.34);z-index:50;
-  opacity:0;pointer-events:none;transition:opacity .22s;
-}
-.scrim.on{opacity:1;pointer-events:auto}
-.sheet{
-  position:fixed;left:0;right:0;bottom:0;z-index:60;margin:0 auto;max-width:460px;
-  background:var(--bg);border-radius:22px 22px 0 0;
-  transform:translateY(102%);transition:transform .26s cubic-bezier(.2,.8,.3,1);
-  max-height:88vh;display:flex;flex-direction:column;
-  box-shadow:0 -12px 40px -10px rgba(42,38,34,.3);
-}
-.sheet.on{transform:translateY(0)}
-.sheet-handle{width:36px;height:4px;border-radius:99px;background:#DED5C7;margin:9px auto 0;flex:none}
-.sheet-head{display:flex;align-items:flex-start;gap:10px;padding:14px 20px 6px;flex:none}
-.sheet-title{font-size:18px;font-weight:700;letter-spacing:-.2px;flex:1;min-width:0;line-height:1.35}
-.sheet-title .em{margin-right:6px}
-.x{width:30px;height:30px;border-radius:50%;background:#EDE6DB;color:var(--ink2);display:grid;place-items:center;font-size:16px;flex:none;margin-top:-1px}
-.x:active{background:#E2D9CC}
-.sheet-body{padding:4px 20px 26px;overflow-y:auto;-webkit-overflow-scrolling:touch}
-
-.meta-row{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--ink2);margin-top:7px;line-height:1.45}
-.meta-row .ic{flex:none;width:16px;text-align:center;opacity:.8}
-.note{
-  margin-top:12px;background:#fff;border:1px solid var(--line);border-radius:13px;
-  padding:10px 12px;font-size:12.5px;color:var(--ink2);line-height:1.55;
-}
-.sec-h{font-size:12px;font-weight:700;color:var(--ink3);letter-spacing:.06em;margin:22px 0 9px}
-
-/* 参与者分组 */
-.bgroup{background:#fff;border:1px solid var(--line);border-radius:13px;padding:10px 12px;margin-bottom:8px}
-.bg-head{display:flex;align-items:baseline;gap:7px;font-size:12px;color:var(--ink3);margin-bottom:7px}
-.bg-head b{font-size:12.5px;color:var(--ink);font-weight:650}
-.bg-head .cnt{margin-left:auto;font-size:11px}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{
-  display:inline-flex;align-items:center;gap:5px;background:#F7F2EA;border-radius:999px;
-  padding:2px 9px 2px 2px;font-size:12px;color:var(--ink);
-}
-.chip .avatar{width:20px;height:20px;font-size:9.5px}
-.chip.maybe{background:#FFF6E4;color:#8B6314;border:1px dashed #E8CD93;padding:2px 9px}
-.chip.maybe .avatar{opacity:.55}
-.chip.host::after{content:"发起";font-size:9px;background:var(--accent);color:#fff;border-radius:99px;padding:1px 5px;margin-left:1px}
-.chip .q{font-size:10px;opacity:.8}
-.empty-note{font-size:12px;color:var(--ink3);padding:2px 0}
-.silent{margin-top:9px;font-size:11.5px;color:var(--ink3);line-height:1.5}
-
-/* 我的选择 */
-.me-row{
-  display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);
-  border-radius:13px;padding:9px 10px 9px 13px;margin-bottom:8px;
-}
-.me-row .lbl{flex:1;min-width:0}
-.me-row .l1{font-size:13px;font-weight:650}
-.me-row .l2{font-size:10.5px;color:var(--ink3);margin-top:1px;font-variant-numeric:tabular-nums}
-.btn-grp{display:flex;gap:4px;flex:none}
-.tbtn{border-radius:9px;padding:6px 9px;font-size:11.5px;font-weight:650;background:#F3EEE6;color:var(--ink2);border:1px solid transparent;transition:all .12s;white-space:nowrap}
-.tbtn:active{transform:scale(.96)}
-.tbtn.on-in{background:#2C6B52;color:#fff}
-.tbtn.on-maybe{background:#FFF0CC;color:#8B6314;border-color:#E8CD93}
-.tbtn.on-out{background:#E7E1D7;color:#5F574E}
-.legend{display:flex;gap:12px;margin:-3px 0 10px;font-size:10.5px;color:var(--ink3)}
-.lg{display:inline-flex;align-items:center;gap:4px}
-.lg::before{content:"";width:9px;height:9px;border-radius:3px;display:inline-block;flex:none}
-.lg.in::before{background:#2C6B52}
-.lg.maybe::before{background:#E8B84B}
-.lg.out::before{background:#C3B9AB}
-.lg.none::before{background:#fff;border:1px dashed #C3B9AB}
-
-.all-in{
-  width:100%;background:#fff;border:1px dashed #D9CFBF;border-radius:13px;padding:10px;
-  font-size:12.5px;color:var(--ink2);font-weight:600;margin-top:2px;
-}
-.all-in:active{background:#F7F2EA}
-.share-row{display:flex;gap:8px;margin-top:10px}
-.ghost-btn{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 8px;font-size:12.5px;font-weight:650;color:var(--ink2)}
 .ghost-btn:active{background:#F7F2EA}
-
-/* 手动复制弹层 */
-.copy-overlay{position:fixed;inset:0;background:rgba(42,38,34,.42);z-index:90;display:grid;place-items:center;padding:20px}
-.copy-box{background:var(--bg);border-radius:18px;padding:16px;width:100%;max-width:380px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
-.copy-title{font-size:13px;font-weight:650;margin-bottom:10px;color:var(--ink2)}
-.copy-box textarea{
-  width:100%;height:140px;border:1px solid var(--line);border-radius:12px;padding:11px;
-  font-size:13px;line-height:1.6;resize:none;font-family:inherit;background:#fff;outline:none;color:var(--ink);
-}
-.copy-box .primary{margin-top:12px;box-shadow:none}
-
-/* 创建表单 */
-.form-label{font-size:12px;font-weight:700;color:var(--ink3);letter-spacing:.06em;margin:18px 0 8px}
+.back{font-size:20px;color:var(--ink3);padding:6px 10px;margin-left:-10px;align-self:flex-start}
+.onb-form{padding-top:22px}
+.onb-form h1{font-size:22px;margin-top:6px}
+.fld-label{font-size:11.5px;font-weight:700;color:var(--ink3);letter-spacing:.06em;margin:19px 0 8px}
 .field{
   width:100%;background:#fff;border:1px solid var(--line);border-radius:13px;
   padding:12px 14px;font-size:15px;outline:none;transition:border-color .15s,box-shadow .15s;
 }
 .field::placeholder{color:#C3B9AB}
 .field:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(232,103,74,.10)}
-.field.sm{font-size:13.5px;padding:10px 13px;margin-top:8px}
-.emoji-row{display:flex;gap:6px;overflow-x:auto;padding:2px 0 4px;scrollbar-width:none}
-.emoji-row::-webkit-scrollbar{display:none}
-.emoji-pick{
-  width:42px;height:42px;flex:none;border-radius:12px;background:#fff;border:1px solid var(--line);
-  display:grid;place-items:center;font-size:20px;transition:all .12s;
+.field.sm{font-size:13.5px;padding:10px 13px}
+.member-add{display:flex;gap:8px;margin-top:8px}
+.member-add .field{flex:1}
+.member-add button{background:#fff;border:1px solid var(--line);border-radius:13px;padding:0 16px;font-size:13px;font-weight:650;color:var(--ink2)}
+.mlist{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.mitem{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 12px}
+.mitem .nm{flex:1;font-size:14px}
+.mitem .del{color:var(--ink3);font-size:18px;padding:0 4px}
+
+/* ================= 顶栏 ================= */
+.topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:14px 0 6px}
+.topbar-left{flex:1;min-width:0}
+.brand{font-size:16px;font-weight:700;letter-spacing:-.2px;display:flex;align-items:center;gap:6px}
+.brand .demo-tag{font-size:8.5px;font-weight:700;letter-spacing:.08em;color:#B4462B;background:var(--accent-soft);border-radius:5px;padding:2px 5px}
+.subline{margin-top:5px;font-size:12px;color:var(--ink2);display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.group-chip{display:inline-flex;align-items:center;gap:3px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 9px;font-size:11px;color:var(--ink2);max-width:100%}
+.group-chip:active{background:#F3EEE6}
+.group-chip span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pending-note{
+  display:inline-flex;align-items:center;gap:3px;
+  font-size:10px;color:#B4462B;background:var(--accent-soft);
+  border-radius:999px;padding:3px 8px;font-weight:600;white-space:nowrap;
 }
+.me-chip{display:flex;align-items:center;gap:5px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 9px 3px 3px;flex:none}
+.me-chip:active{background:#F7F3EC}
+.me-chip .nm{font-size:11.5px;font-weight:600;max-width:52px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.avatar{width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;font-size:11px;font-weight:700;color:#fff;flex:none}
+.avatar.sm{width:20px;height:20px;font-size:9px}
+
+/* ================= 视图切换 ================= */
+.vtabs{display:flex;gap:4px;background:#F1EBE2;border-radius:12px;padding:3px;margin:10px 0 8px}
+.vtabs button{flex:1;border-radius:9px;padding:7px 4px;font-size:12px;font-weight:650;color:var(--ink2)}
+.vtabs button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(42,38,34,.12)}
+.vmeta{display:flex;align-items:center;justify-content:space-between;padding:0 2px 7px}
+.vmeta .range{font-size:11.5px;color:var(--ink3)}
+.zoomer{display:flex;align-items:center;gap:2px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:1px}
+.zoomer button{width:26px;height:23px;display:grid;place-items:center;font-size:14px;color:var(--ink2);border-radius:7px}
+.zoomer button:active{background:#F1EBE2}
+
+/* ================= 日历 ================= */
+.cal{position:relative;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 2px 10px -6px rgba(42,38,34,.12)}
+.cal-scroll{overflow:auto;max-height:calc(100dvh - 196px);-webkit-overflow-scrolling:touch}
+.cal-inner{position:relative}
+
+.cal-head{display:flex;position:sticky;top:0;z-index:12;background:#fff;border-bottom:1px solid var(--line)}
+.cal-corner{flex:none;width:46px;border-right:1px solid var(--line);background:#fff;position:sticky;left:0;z-index:13}
+.cal-dayhead{flex:1;min-width:0;padding:6px 3px 5px;text-align:center;border-right:1px solid #F3EDE4;background:#fff;line-height:1.25}
+.cal[data-scroll="1"] .cal-dayhead{flex:none}
+.cal-dayhead:last-child{border-right:none}
+.cal-dayhead b{display:block;font-size:12px;font-weight:700}
+.cal-dayhead span{display:block;font-size:9px;color:var(--ink3);margin-top:1px}
+.cal-dayhead.today b{color:var(--accent)}
+.cal-dayhead.today span{color:var(--accent);opacity:.75}
+
+.cal-body{position:relative;display:flex}
+.gutter{position:sticky;left:0;z-index:8;flex:none;width:46px;background:#fff;border-right:1px solid var(--line)}
+.g-hour{position:absolute;right:5px;transform:translateY(-50%);font-size:9px;color:#B9B0A3;font-variant-numeric:tabular-nums}
+.g-band{position:absolute;left:3px;transform:translateY(2px);font-size:8.5px;font-weight:700;color:#9C9284;white-space:nowrap}
+.g-band[data-kind="meal"]{color:#B98A3C}
+.g-band[data-kind="night"]{color:#7E7BA6}
+.g-band[data-kind="late"]{color:#BDB5A9}
+
+.daycol{position:relative;flex:1;min-width:0;border-right:1px solid #F3EDE4;touch-action:none;user-select:none}
+.cal[data-scroll="1"] .daycol{flex:none}
+.daycol:last-child{border-right:none}
+.band{position:absolute;left:0;right:0;pointer-events:none}
+.band[data-kind="meal"]{background:rgba(232,168,74,.075)}
+.band[data-kind="night"]{background:rgba(110,110,190,.055)}
+.band[data-kind="late"]{background:rgba(90,80,70,.05)}
+.band-line{position:absolute;left:0;right:0;border-top:1px dashed rgba(60,50,40,.09);pointer-events:none}
+.hourline{position:absolute;left:0;right:0;height:0;border-top:1px solid rgba(60,50,40,.055);pointer-events:none}
+.nowline{position:absolute;left:0;right:0;height:2px;background:var(--accent);opacity:.5;z-index:4;pointer-events:none}
+.nowline::before{content:"";position:absolute;left:-3px;top:-3px;width:8px;height:8px;border-radius:50%;background:var(--accent)}
+
+.emptyhint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:10px;color:#D2C8B9;pointer-events:none;white-space:nowrap;text-align:center;line-height:1.5}
+
+.selmask{position:absolute;left:2px;right:2px;z-index:6;pointer-events:none;border-radius:9px;background:rgba(232,103,74,.15);border:1.5px solid var(--accent)}
+.seltag{
+  position:absolute;left:50%;z-index:7;pointer-events:none;transform:translate(-50%,-50%);
+  background:var(--accent);color:#fff;font-size:10px;font-weight:700;
+  border-radius:999px;padding:2px 7px;white-space:nowrap;box-shadow:0 2px 6px rgba(232,103,74,.4);
+}
+
+/* ================= 活动卡片 ================= */
+.card{
+  position:absolute;z-index:5;overflow:hidden;text-align:left;
+  background:#fff;border-radius:9px;border:1px solid var(--line);
+  border-left:3px solid var(--c,var(--accent));
+  padding:5px 6px 4px 7px;
+  box-shadow:0 1px 2px rgba(42,38,34,.05),0 4px 10px -6px rgba(42,38,34,.18);
+  transition:transform .1s;min-height:22px;display:flex;flex-direction:column;
+}
+.card:active{transform:scale(.975)}
+.card .ct{display:flex;align-items:flex-start;gap:3px;min-width:0;padding-right:9px}
+.card .ce{font-size:12px;line-height:1.25;flex:none}
+.card .cn{font-size:12px;font-weight:700;line-height:1.28;letter-spacing:-.1px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card .ctime{margin-top:1px;font-size:9.5px;color:var(--ink3);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .cplace{margin-top:1px;font-size:9.5px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .cfoot{margin-top:auto;padding-top:2px;display:flex;align-items:center;gap:3px}
+.pile{display:flex;align-items:center;min-width:0}
+.pile .avatar{width:15px;height:15px;font-size:7.5px;border:1.5px solid #fff;margin-left:-4px}
+.pile .avatar:first-child{margin-left:0}
+.pile .more{width:15px;height:15px;border-radius:50%;background:#F1EBE2;color:var(--ink2);display:inline-grid;place-items:center;font-size:7px;font-weight:700;border:1.5px solid #fff;margin-left:-4px}
+.card .dot{position:absolute;top:5px;right:5px;width:6px;height:6px;border-radius:50%}
+.card .dot.in{background:var(--green);box-shadow:0 0 0 2px var(--green-soft)}
+.card .dot.maybe{background:#D9A93C;box-shadow:0 0 0 2px var(--amber-soft)}
+.card[data-compact="1"] .cplace,.card[data-compact="1"] .ctime,.card[data-compact="1"] .cfoot{display:none}
+.card[data-compact="1"] .cn{-webkit-line-clamp:1}
+.csegs{margin-top:4px;display:flex;flex-direction:column;gap:1px;overflow:hidden}
+.cseg{display:flex;align-items:baseline;gap:3px;font-size:9px;color:var(--ink3);line-height:1.3}
+.cseg span{flex:1;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cseg b{font-weight:700;color:var(--ink2);font-variant-numeric:tabular-nums}
+.cseg i{font-style:normal;color:#B98A24;font-weight:600}
+.cseg.mi b{color:var(--green)}
+.cseg.mm b{color:var(--amber)}
+
+/* ================= 底部操作条 ================= */
+.bar{
+  position:fixed;left:50%;bottom:12px;transform:translate(-50%,calc(100% + 30px));
+  width:calc(100% - 24px);max-width:496px;z-index:40;opacity:0;pointer-events:none;
+  background:#2A2622;color:#fff;border-radius:16px;padding:9px 9px 9px 14px;
+  display:flex;align-items:center;gap:9px;
+  box-shadow:0 12px 32px -8px rgba(42,38,34,.5);
+  transition:transform .22s cubic-bezier(.2,.8,.3,1),opacity .18s;
+}
+.bar.on{transform:translate(-50%,0);opacity:1;pointer-events:auto}
+.bar .txt{flex:1;min-width:0}
+.bar .t1{font-size:12.5px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .t2{font-size:10px;color:rgba(255,255,255,.55);margin-top:1px}
+.bar .go{background:#fff;color:#2A2622;border-radius:11px;padding:8px 13px;font-size:12.5px;font-weight:700;flex:none}
+.bar .go:active{background:#EDE7DE}
+.bar .cancel{color:rgba(255,255,255,.6);font-size:12.5px;padding:6px;flex:none}
+
+/* ================= 抽屉 ================= */
+.scrim{position:fixed;inset:0;background:rgba(42,38,34,.34);z-index:50;opacity:0;pointer-events:none;transition:opacity .22s}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:60;margin:0 auto;max-width:520px;
+  background:var(--bg);border-radius:22px 22px 0 0;
+  transform:translateY(102%);transition:transform .26s cubic-bezier(.2,.8,.3,1);
+  max-height:90dvh;display:flex;flex-direction:column;
+  box-shadow:0 -12px 40px -10px rgba(42,38,34,.3);
+}
+.sheet.on{transform:translateY(0)}
+.sheet-handle{width:36px;height:4px;border-radius:99px;background:#DED5C7;margin:9px auto 0;flex:none}
+.sheet-head{display:flex;align-items:flex-start;gap:10px;padding:12px 18px 4px;flex:none}
+.sheet-title{font-size:17px;font-weight:700;letter-spacing:-.2px;flex:1;min-width:0;line-height:1.35}
+.x{width:30px;height:30px;border-radius:50%;background:#EDE6DB;color:var(--ink2);display:grid;place-items:center;font-size:16px;flex:none;margin-top:-1px}
+.x:active{background:#E2D9CC}
+.sheet-body{padding:4px 18px 18px;overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1}
+
+.meta-row{display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--ink2);margin-top:5px;line-height:1.45}
+.meta-row .ic{flex:none;width:16px;text-align:center;opacity:.8}
+.note{margin-top:10px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 11px;font-size:12px;color:var(--ink2);line-height:1.55}
+.sec-h{font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:.06em;margin:18px 0 8px}
+
+.bgroup{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin-bottom:6px}
+.bg-head{display:flex;align-items:baseline;gap:6px;font-size:11px;color:var(--ink3);margin-bottom:6px}
+.bg-head b{font-size:11.5px;color:var(--ink);font-weight:650}
+.bg-head .cnt{margin-left:auto;font-size:10px}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{display:inline-flex;align-items:center;gap:4px;background:#F7F2EA;border-radius:999px;padding:2px 8px 2px 2px;font-size:11px;color:var(--ink)}
+.chip .avatar{width:17px;height:17px;font-size:8px}
+.chip.maybe{background:var(--amber-soft);color:var(--amber);border:1px dashed #E8CD93;padding:2px 8px}
+.chip.maybe .avatar{opacity:.55}
+.chip.host::after{content:"发起";font-size:8px;background:var(--accent);color:#fff;border-radius:99px;padding:1px 4px;margin-left:1px}
+.chip .q{font-size:8.5px;opacity:.8}
+.empty-note{font-size:11.5px;color:var(--ink3);padding:2px 0}
+.silent{margin-top:7px;font-size:10.5px;color:var(--ink3);line-height:1.5}
+
+.joinrow{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:7px 8px 7px 11px;margin-bottom:6px}
+.joinrow .jl{flex:1;min-width:0}
+.joinrow .j1{font-size:12px;font-weight:650}
+.joinrow .j2{font-size:9.5px;color:var(--ink3);margin-top:1px;font-variant-numeric:tabular-nums}
+.tg{display:flex;gap:3px;flex:none}
+.tbtn{border-radius:8px;padding:6px 8px;font-size:10.5px;font-weight:650;background:#F3EEE6;color:var(--ink2);border:1px solid transparent;transition:all .1s;white-space:nowrap}
+.tbtn:active{transform:scale(.95)}
+.tbtn.on-in{background:var(--green);color:#fff}
+.tbtn.on-maybe{background:#FFF0CC;color:var(--amber);border-color:#E8CD93}
+.tbtn.on-out{background:#E7E1D7;color:#5F574E}
+.all-in{width:100%;background:#fff;border:1px dashed #D9CFBF;border-radius:12px;padding:8px;font-size:11.5px;color:var(--ink2);font-weight:600;margin-top:2px}
+.all-in:active{background:#F7F2EA}
+
+.savebar{display:flex;gap:8px;align-items:center;padding:9px 18px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:rgba(250,247,242,.97);flex:none}
+.savebar .dirty{flex:1;font-size:10.5px;color:var(--amber);opacity:0;transition:opacity .15s}
+.savebar.dirty .dirty{opacity:1}
+.savebar .sv{background:var(--accent);color:#fff;border-radius:12px;padding:10px 20px;font-size:13px;font-weight:700;flex:none}
+.savebar .sv:disabled{background:#E5DDD2;color:#A79C90}
+.savebar .cc{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 15px;font-size:12.5px;font-weight:650;color:var(--ink2);flex:none}
+
+.span-box{background:var(--accent-soft);border-radius:13px;padding:10px 13px}
+.span-box .big{font-size:19px;font-weight:700;color:#B4462B;font-variant-numeric:tabular-nums;letter-spacing:-.3px}
+.span-box .sub{font-size:10.5px;color:#B4462B;opacity:.7;margin-top:1px}
+.time-edit{display:flex;align-items:center;gap:7px;margin-top:9px}
+.time-edit .tgrp{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:6px 7px;display:flex;align-items:center;gap:4px}
+.time-edit .tgrp .lab{font-size:9.5px;color:var(--ink3);width:22px;flex:none}
+.time-edit .tgrp .val{flex:1;text-align:center;font-size:14px;font-weight:700;font-variant-numeric:tabular-nums}
+.time-edit .tgrp button{width:28px;height:28px;border-radius:8px;background:#F3EEE6;display:grid;place-items:center;font-size:14px;color:var(--ink2);flex:none}
+.time-edit .tgrp button:active{background:#E7E0D4}
+.emoji-row{display:flex;gap:5px;overflow-x:auto;padding:2px 0 4px;scrollbar-width:none}
+.emoji-row::-webkit-scrollbar{display:none}
+.emoji-pick{width:38px;height:38px;flex:none;border-radius:11px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;font-size:18px;transition:all .1s}
 .emoji-pick:active{transform:scale(.94)}
 .emoji-pick.on{background:var(--accent-soft);border-color:var(--accent);box-shadow:0 0 0 3px rgba(232,103,74,.1)}
-.span-pill{
-  display:inline-flex;align-items:center;gap:7px;background:var(--accent-soft);color:#B4462B;
-  border-radius:999px;padding:7px 13px;font-size:12.5px;font-weight:650;margin:2px 0 4px;
-}
-.primary{
-  width:100%;background:var(--accent);color:#fff;border-radius:14px;padding:14px;
-  font-size:15px;font-weight:700;margin-top:22px;box-shadow:0 6px 16px -6px rgba(232,103,74,.6);
-}
-.primary:active{background:#D95B3E}
-.primary:disabled{background:#E5DDD2;color:#A79C90;box-shadow:none}
+.switch-row{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:8px}
+.switch-row .sl{flex:1;min-width:0}
+.switch-row .s1{font-size:12.5px;font-weight:650}
+.switch-row .s2{font-size:10px;color:var(--ink3);margin-top:1px;line-height:1.4}
+.sw{width:42px;height:25px;border-radius:99px;background:#DDD4C7;position:relative;flex:none;transition:background .15s}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.sw.on{background:var(--green)}
+.sw.on::after{transform:translateX(17px)}
 
-/* 人员列表 */
 .plist{display:flex;flex-direction:column;gap:6px;margin-top:6px}
-.prow{
-  display:flex;align-items:center;gap:11px;background:#fff;border:1px solid var(--line);
-  border-radius:13px;padding:10px 12px;text-align:left;width:100%;
-}
+.prow{display:flex;align-items:center;gap:11px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 12px;text-align:left;width:100%}
 .prow:active{background:#F7F2EA}
 .prow .avatar{width:30px;height:30px;font-size:12px}
 .prow .nm{font-size:14px;font-weight:600;flex:1}
-.prow .tick{font-size:13px;color:var(--accent);font-weight:700}
+.prow .tick{font-size:12px;color:var(--accent);font-weight:700}
 .prow.on{border-color:var(--accent);background:var(--accent-soft)}
-.sub-note{font-size:12px;color:var(--ink3);line-height:1.5;margin:2px 0 10px}
+.sub-note{font-size:11.5px;color:var(--ink3);line-height:1.55;margin:2px 0 10px}
 
-/* 小工具 */
+.copy-overlay{position:fixed;inset:0;background:rgba(42,38,34,.42);z-index:90;display:grid;place-items:center;padding:20px}
+.copy-box{background:var(--bg);border-radius:18px;padding:16px;width:100%;max-width:380px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.copy-title{font-size:12.5px;font-weight:650;margin-bottom:10px;color:var(--ink2)}
+.copy-box textarea{width:100%;height:140px;border:1px solid var(--line);border-radius:12px;padding:11px;font-size:12.5px;line-height:1.6;resize:none;font-family:inherit;background:#fff;outline:none;color:var(--ink)}
+.copy-box .primary{margin-top:12px;box-shadow:none}
+
 .toast{
-  position:fixed;left:50%;bottom:96px;transform:translate(-50%,16px);z-index:80;
-  background:rgba(42,38,34,.92);color:#fff;border-radius:12px;padding:9px 15px;font-size:12.5px;
-  opacity:0;pointer-events:none;transition:all .2s;white-space:nowrap;max-width:80vw;
+  position:fixed;left:50%;bottom:86px;transform:translate(-50%,14px);z-index:95;
+  background:rgba(42,38,34,.94);color:#fff;border-radius:11px;padding:8px 14px;font-size:12px;
+  opacity:0;pointer-events:none;transition:all .2s;white-space:nowrap;max-width:86vw;
 }
 .toast.on{opacity:1;transform:translate(-50%,0)}
-.footer-note{text-align:center;font-size:11px;color:#C3B9AB;margin-top:34px;line-height:1.7}
-.footer-note button{color:#A79C90;text-decoration:underline;font-size:11px}
-
-@media (max-width:360px){
-  .app{padding-left:12px;padding-right:12px}
-  .timeline{grid-auto-rows:72px}
-}
+.footer-note{text-align:center;font-size:10.5px;color:#C3B9AB;margin-top:18px;line-height:1.7}
+.footer-note button{color:#A79C90;text-decoration:underline;font-size:10.5px}
 </style>
 </head>
 <body>
-
-<div class="app">
-  <header class="topbar">
-    <div class="topbar-left">
-      <div class="brand">周末活动小助手</div>
-      <div class="subline">
-        <button class="group-chip" data-action="open-group"><span id="groupEmoji">🏕️</span><span id="groupName">周末常玩组</span><span id="groupCount">· 6人</span></button>
-        <span id="pendingMount"></span>
-      </div>
-    </div>
-    <button class="me-chip" data-action="open-me">
-      <span class="avatar" id="meAvatar">小</span>
-      <span class="nm" id="meName">小明</span>
-      <span class="caret">▾</span>
-    </button>
-  </header>
-
-  <div id="hintMount"></div>
-  <main id="days"></main>
-
-  <div class="footer-note" id="footerMount"></div>
-</div>
-
-<div class="selectbar" id="selectbar"></div>
-<div class="scrim" id="scrim" data-action="close-sheet"></div>
+<div id="screen"></div>
+<div class="bar" id="bar"></div>
+<div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet"></div>
 <div class="toast" id="toast"></div>
-
 <script>
 /* =========================================================
-   周末活动小助手 — 单文件 demo
-   数据只存在本机浏览器，没有后端。
+   周末活动小助手 v4
+   单文件 demo：引导 → 群组 → 连续时间轴 → 活动报名
    ========================================================= */
 
-const WEEKEND = {
-  sat:{ name:"周六", date:"10月31日" },
-  sun:{ name:"周日", date:"11月1日" }
-};
+const SNAP = 15;
+const DAY_MIN = 8*60, DAY_MAX = 24*60, EVE_MIN = 17*60;
+const STORAGE_KEY = "weekend-helper-v4";
 
-const BLOCKS = [
-  { id:"am",     label:"上午", time:"09:00–11:30", kind:"normal" },
-  { id:"lunch",  label:"午饭", time:"11:30–13:30", kind:"meal"   },
-  { id:"pm",     label:"下午", time:"13:30–17:30", kind:"normal" },
-  { id:"dinner", label:"晚饭", time:"17:30–19:30", kind:"meal"   },
-  { id:"eve",    label:"晚上", time:"19:30–22:30", kind:"night"  },
-  { id:"late",   label:"夜宵", time:"22:30–",      kind:"late"   }
+const BANDS = [
+  { id:"am",     name:"上午", s:8*60,      e:11*60+30, kind:"normal" },
+  { id:"lunch",  name:"午饭", s:11*60+30,  e:13*60+30, kind:"meal"   },
+  { id:"pm",     name:"下午", s:13*60+30,  e:17*60+30, kind:"normal" },
+  { id:"dinner", name:"晚饭", s:17*60+30,  e:19*60+30, kind:"meal"   },
+  { id:"eve",    name:"晚上", s:19*60+30,  e:22*60+30, kind:"night"  },
+  { id:"late",   name:"夜宵", s:22*60+30,  e:24*60,    kind:"late"   }
 ];
 
-const PEOPLE = [
-  { id:"p1", name:"老王",  color:"#E8674A" },
-  { id:"p2", name:"阿花",  color:"#C97A2E" },
-  { id:"p3", name:"小明",  color:"#5B6CB8" },
-  { id:"p4", name:"Momo",  color:"#4C8C6B" },
-  { id:"p5", name:"大头",  color:"#9B6BB5" },
-  { id:"p6", name:"小鹿",  color:"#3E8BA8" }
-];
+const PALETTE = ["#E8674A","#C97A2E","#5B6CB8","#4C8C6B","#9B6BB5","#3E8BA8","#B5586B","#6B8B3E"];
+const EMOJIS  = ["🍲","🍜","🍢","🍻","🎲","🎬","🍁","🏸","🥾","🎮","☕","🎤","🏕️","🍕","🎳","🎵"];
+const GROUP_EMOJIS = ["🏕️","🍜","🎲","⚽️","🎬","☕️","🍻","🎮"];
+const WEEK_CN = ["周日","周一","周二","周三","周四","周五","周六"];
 
-const STORAGE_KEY = "weekend-helper-v1";
-
-const SEED = {
-  groupName:"周末常玩组",
-  groupEmoji:"🏕️",
-  meId:"p3",
-  hintDismissed:false,
-  activities:[
-    {
-      id:"a1", title:"老王火锅局", emoji:"🍲", color:"#E8674A",
-      day:"sat", blocks:["lunch","pm","dinner"], host:"p1",
-      place:"蜀大侠 · 国贸店",
-      note:"下午涮完去旁边桌游店坐坐，晚饭回来接着吃。",
-      joined:{
-        p1:{ lunch:"in", pm:"in", dinner:"in" },
-        p2:{ lunch:"in", pm:"maybe", dinner:"in" },
-        p5:{ lunch:"in", pm:"in", dinner:"maybe" }
-      }
-    },
-    {
-      id:"a2", title:"香山看红叶", emoji:"🍁", color:"#4C8C6B",
-      day:"sun", blocks:["am","lunch"], host:"p4",
-      place:"香山公园东门",
-      note:"八点半东门集合，带瓶水，人多吃个早午饭再回。",
-      joined:{
-        p4:{ am:"in", lunch:"in" },
-        p6:{ am:"in", lunch:"maybe" },
-        p1:{ am:"maybe" }
-      }
-    },
-    {
-      id:"a3", title:"桌游夜", emoji:"🎲", color:"#5B6CB8",
-      day:"sat", blocks:["eve","late"], host:"p3",
-      place:"我家客厅",
-      note:"狼人杀 + 德州，夜宵点烧烤。",
-      joined:{
-        p3:{ eve:"in", late:"maybe" },
-        p1:{ eve:"in", late:"in" },
-        p2:{ eve:"in" }
-      }
-    }
-  ]
-};
-
-/* ---------------- 状态 ---------------- */
-let state = loadState();
-let sel = null;              // { day, start, end }
-let sheetMode = null;        // "detail" | "create" | "me" | "group"
-let lastSheetMode = null;
-let activeActId = null;
-let draft = null;            // { day, blocks:[], emoji, color }
-
-function clone(o){ return JSON.parse(JSON.stringify(o)); }
-
-function loadState(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(raw) return JSON.parse(raw);
-  }catch(e){}
-  return clone(SEED);
+/* ---------------- 工具 ---------------- */
+function pad(n){ return String(n).padStart(2,"0"); }
+function ymd(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+function parseYmd(s){ const a=s.split("-").map(Number); return new Date(a[0],a[1]-1,a[2]); }
+function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+function startOfDay(d){ const x=new Date(d); x.setHours(0,0,0,0); return x; }
+function isToday(d){ return ymd(d)===ymd(new Date()); }
+function fmtMD(d){ return (d.getMonth()+1)+"/"+d.getDate(); }
+function fmtTime(min){
+  const h=Math.floor(min/60)%24, m=min%60;
+  return pad(h)+":"+pad(m);
 }
-function saveState(){
-  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
-}
-
-/* ---------------- 小工具 ---------------- */
-function person(id){ return PEOPLE.find(p=>p.id===id) || {id,name:"?",color:"#999"}; }
-function actById(id){ return state.activities.find(a=>a.id===id); }
-function blockIdx(id){ return BLOCKS.findIndex(b=>b.id===id); }
-function blockBy(id){ return BLOCKS[blockIdx(id)]; }
 function esc(s){
   return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
-function sameDayLabel(day){ return WEEKEND[day].name; }
+function uid(p){ return p + Math.random().toString(36).slice(2,8); }
 
-function spanText(day, blocks){
-  if(!blocks || !blocks.length) return "";
-  const lo = blockIdx(blocks[0]);
-  const hi = blockIdx(blocks[blocks.length-1]);
-  const a = BLOCKS[lo], b = BLOCKS[hi];
-  const range = lo===hi ? a.label : a.label+"–"+b.label;
-  return WEEKEND[day].name + " · " + range;
+function weekendDates(){
+  const t = startOfDay(new Date());
+  const dow = t.getDay();
+  let sat;
+  if(dow === 6) sat = t;
+  else if(dow === 0) sat = addDays(t,-1);
+  else sat = addDays(t, 6-dow);
+  return [sat, addDays(sat,1)];
 }
-function spanTimeText(blocks){
-  const a = BLOCKS[blockIdx(blocks[0])];
-  const b = BLOCKS[blockIdx(blocks[blocks.length-1])];
-  return a.time.split("–")[0] + "–" + b.time.split("–")[1];
-}
-function avatarHTML(p, cls){
-  return '<span class="avatar '+(cls||"")+'" style="background:'+p.color+'">'+esc(p.name.slice(0,1))+'</span>';
-}
-
-function toast(msg){
-  const el = document.getElementById("toast");
-  el.textContent = msg;
-  el.classList.add("on");
-  clearTimeout(toast._t);
-  toast._t = setTimeout(()=>el.classList.remove("on"), 1800);
+function weekdayDates(){
+  const t = startOfDay(new Date());
+  const dow = t.getDay();
+  let mon;
+  if(dow === 0) mon = addDays(t,1);
+  else if(dow === 6) mon = addDays(t,2);
+  else mon = addDays(t, 1-dow);
+  return [0,1,2,3,4].map(i=>addDays(mon,i));
 }
 
-/* 复制到剪贴板：优先 Clipboard API，失败退回 execCommand */
-async function copyText(text){
+/* ---------------- 状态 ---------------- */
+let state = loadState();
+let ui = {
+  view: "weekend",
+  zoom: 1,
+  sheet: null,
+  actId: null,
+  draft: null,
+  joinDraft: null,
+  sel: null,
+  onbStep: "welcome",
+  onbDraft: null
+};
+
+function defaultState(){
+  return { v:4, onboarded:false, meId:null, activeGroupId:null, groups:[], activities:[] };
+}
+function loadState(){
   try{
-    await navigator.clipboard.writeText(text);
-    return true;
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){ const s = JSON.parse(raw); if(s && s.v===4) return s; }
   }catch(e){}
-  try{
-    const ta = document.createElement("textarea");
-    ta.value = text;
-    ta.style.position = "fixed";
-    ta.style.top = "-1000px";
-    document.body.appendChild(ta);
-    ta.select();
-    const ok = document.execCommand("copy");
-    document.body.removeChild(ta);
-    return ok;
-  }catch(e){ return false; }
+  return defaultState();
 }
+function save(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
 
-function inviteText(a){
-  const lines = [];
-  lines.push(a.emoji + " " + spanText(a.day, a.blocks) + " · " + a.title);
-  if(a.place) lines.push("📍 " + a.place);
-  if(a.note) lines.push(a.note);
-  const n = Object.keys(a.joined).length;
-  lines.push(n ? ("已经 " + n + " 人报名，来不来？") : "来不来？");
-  return lines.join("\n");
+/* ---------------- 当前群组 ---------------- */
+function group(){ return state.groups.find(g=>g.id===state.activeGroupId) || state.groups[0] || null; }
+function members(){ return group() ? group().members : []; }
+function member(id){
+  const g = group();
+  if(!g) return {id:"?",name:"?",color:"#999"};
+  return g.members.find(m=>m.id===id) || {id:"?",name:"?",color:"#999"};
 }
-
-function nudgeText(a){
-  const silent = PEOPLE.filter(p => !a.joined[p.id] && p.id !== state.meId);
-  return "还差你们 " + silent.length + " 个：" + silent.map(p=>p.name).join("、") + "\n" +
-    spanText(a.day, a.blocks) + " · " + a.title + "\n来不来？点开选一下你能去的时段。";
+function me(){ return member(state.meId); }
+function activities(){
+  const g = group();
+  if(!g) return [];
+  return state.activities.filter(a=>a.groupId===g.id);
 }
+function actById(id){ return state.activities.find(a=>a.id===id); }
 
-/* 自动复制失败时的兜底：给一个可直接全选的文本框 */
-function showCopyBox(text){
-  const div = document.createElement("div");
-  div.className = "copy-overlay";
-  div.innerHTML =
-    '<div class="copy-box">'+
-      '<div class="copy-title">长按全选，复制这段文案</div>'+
-      '<textarea readonly></textarea>'+
-      '<button class="primary" data-copy-close>好了</button>'+
-    '</div>';
-  div.querySelector("textarea").value = text;
-  document.body.appendChild(div);
-  const ta = div.querySelector("textarea");
-  setTimeout(()=>{ ta.focus(); ta.select(); }, 40);
-  div.addEventListener("click", (e)=>{
-    if(e.target === div || e.target.hasAttribute("data-copy-close")) div.remove();
+/* ---------------- 时间与环节 ---------------- */
+function dayRange(){ return ui.view === "evening" ? [EVE_MIN, DAY_MAX] : [DAY_MIN, DAY_MAX]; }
+function dayList(){ return ui.view === "evening" ? weekdayDates() : weekendDates(); }
+
+function partsOf(a){
+  const out = [];
+  BANDS.forEach(b=>{
+    const s = Math.max(b.s, a.start);
+    const e = Math.min(b.e, a.end);
+    if(e - s >= SNAP) out.push({ id:b.id, name:b.name, start:s, end:e, kind:b.kind });
   });
+  return out;
+}
+function participationParts(a){
+  const ps = partsOf(a);
+  if(!a.perPart || ps.length < 2) return [{ id:"*", name:"整个活动", start:a.start, end:a.end }];
+  return ps;
+}
+function statusOf(a, memberId, partId){
+  const rec = a.joined && a.joined[memberId];
+  return (rec && rec[partId]) || "";
+}
+function myStatus(a){
+  if(!a.joined || !a.joined[state.meId]) return "";
+  const vals = Object.values(a.joined[state.meId]);
+  if(vals.includes("in")) return "in";
+  if(vals.includes("maybe")) return "maybe";
+  return "";
+}
+function avatarHTML(m, cls){
+  return '<span class="avatar '+(cls||"")+'" style="background:'+m.color+'">'+esc(m.name.slice(0,1))+'</span>';
 }
 
-/* ---------------- 布局：给活动分配列 ---------------- */
-function layoutDay(acts){
-  const sorted = acts.slice().sort((a,b)=>blockIdx(a.blocks[0])-blockIdx(b.blocks[0]));
-  const laneEnds = [];
-  for(const a of sorted){
-    const s = blockIdx(a.blocks[0]);
-    const e = blockIdx(a.blocks[a.blocks.length-1]);
-    let lane = laneEnds.findIndex(end => end < s);
-    if(lane === -1){ lane = laneEnds.length; laneEnds.push(-1); }
-    laneEnds[lane] = e;
-    a._lane = lane; a._start = s; a._end = e;
-  }
-  return Math.max(1, laneEnds.length);
+/* ================= 引导页 ================= */
+function renderOnboarding(){
+  if(ui.onbStep === "create") return renderOnbCreate();
+  if(ui.onbStep === "join") return renderOnbJoin();
+  return renderWelcome();
 }
 
-/* ---------------- 渲染：顶部 ---------------- */
-function renderHeader(){
-  document.getElementById("groupEmoji").textContent = state.groupEmoji;
-  document.getElementById("groupName").textContent = state.groupName;
-  document.getElementById("groupCount").textContent = "· " + PEOPLE.length + "人";
-  const me = person(state.meId);
-  const av = document.getElementById("meAvatar");
-  av.style.background = me.color;
-  av.textContent = me.name.slice(0,1);
-  document.getElementById("meName").textContent = me.name;
-  document.title = state.groupName + " · 周末活动小助手";
-
-  const pending = state.activities.filter(a => !a.joined[state.meId]);
-  const pm = document.getElementById("pendingMount");
-  if(pending.length){
-    pm.className = "pending-note";
-    pm.innerHTML = '<b>'+pending.length+'</b> 个局待回';
-  }else{
-    pm.className = "";
-    pm.innerHTML = "";
-  }
-}
-
-function renderHint(){
-  const m = document.getElementById("hintMount");
-  if(state.hintDismissed){ m.innerHTML = ""; return; }
-  m.innerHTML =
-    '<div class="hint">'+
-      '<span>点活动报名 · 点空白时段发起活动</span>'+
-      '<button data-action="dismiss-hint">知道了</button>'+
-    '</div>';
-}
-
-/* ---------------- 渲染：时间轴 ---------------- */
-function renderDays(){
-  const mount = document.getElementById("days");
-  mount.innerHTML = renderWeek() + renderFooter();
-}
-
-function renderFooter(){
-  return '<div class="footer-note">'+
-    '演示版 · 数据只存在这台设备的浏览器里<br>'+
-    '<button data-action="reset">重置演示数据</button>'+
+function renderWelcome(){
+  return '<div class="onb">'+
+    '<div class="onb-logo">🏕️</div>'+
+    '<h1>周末活动<br>小助手</h1>'+
+    '<p class="lead">把周末切成时段，一个活动占哪几段、谁去、谁还在犹豫，一眼看清。不用再在群里接龙刷屏。</p>'+
+    '<div class="onb-preview">'+
+      '<div class="onb-row"><div class="onb-blk"></div><div class="onb-blk on"></div><div class="onb-blk on"></div></div>'+
+      '<div class="onb-row"><div class="onb-blk"></div><div class="onb-blk g"></div><div class="onb-blk"></div></div>'+
+      '<div class="onb-row"><div class="onb-blk g"></div><div class="onb-blk"></div><div class="onb-blk"></div></div>'+
+      '<div class="onb-cap">上午 · 午饭 · 下午 · 晚饭 · 晚上 · 夜宵</div>'+
+    '</div>'+
+    '<div class="spacer"></div>'+
+    '<button class="primary" data-action="onb-create">创建一个群组</button>'+
+    '<button class="ghost-btn" data-action="onb-join">我有邀请码</button>'+
+    '<div class="footer-note" style="margin-top:14px">演示版 · 数据只存在这台设备</div>'+
   '</div>';
 }
 
-/* 周六、周日两列并行 */
-function renderWeek(){
-  let h = '<section class="week">';
+function ensureOnbDraft(){
+  if(!ui.onbDraft) ui.onbDraft = { name:"", emoji:"🏕️", meName:"", friends:["老王","阿花","Momo"] };
+  return ui.onbDraft;
+}
 
-  h += '<div class="week-head"><div></div>'+
-       '<div class="wh-day"><b>周六</b><span>10月31日</span></div>'+
-       '<div class="wh-day"><b>周日</b><span>11月1日</span></div></div>';
-
-  h += '<div class="week-grid">';
-
-  const occupied = { sat:new Set(), sun:new Set() };
-  state.activities.forEach(a => a.blocks.forEach(b => occupied[a.day].add(b)));
-
-  BLOCKS.forEach((b,i)=>{
-    h += '<div class="slot-label" data-kind="'+b.kind+'" style="grid-row:'+(i+1)+';grid-column:1">'+
-           '<span class="bl">'+b.label+'</span><span class="bt">'+b.time+'</span>'+
-         '</div>';
-
-    ["sat","sun"].forEach((day,ci)=>{
-      const taken = occupied[day].has(b.id);
-      let inSel = false;
-      if(sel && sel.day === day){
-        const lo = Math.min(sel.start, sel.end), hi = Math.max(sel.start, sel.end);
-        inSel = i >= lo && i <= hi;
-      }
-      const cls = taken ? "slot taken" : ("slot free" + (inSel ? " insel" : ""));
-      h += '<div class="'+cls+'" data-day="'+day+'" data-index="'+i+'" data-block="'+b.id+'" data-kind="'+b.kind+'" '+
-           'style="grid-row:'+(i+1)+';grid-column:'+(ci+2)+'"></div>';
-    });
+function renderOnbCreate(){
+  const d = ensureOnbDraft();
+  let h = '<div class="onb onb-form">';
+  h += '<button class="back" data-action="onb-back">←</button>';
+  h += '<h1>创建你的群组</h1>';
+  h += '<p class="lead" style="margin-bottom:0">一群常玩的人，建一次就够了，以后发活动不用再挨个找人。</p>';
+  h += '<div class="fld-label">群组名</div>';
+  h += '<input class="field" id="gName" maxlength="12" placeholder="比如：周末常玩组" value="'+esc(d.name)+'">';
+  h += '<div class="fld-label">图标</div><div class="emoji-row" id="gEmoji">';
+  GROUP_EMOJIS.forEach(e=>{
+    h += '<button class="emoji-pick '+(d.emoji===e?"on":"")+'" data-action="onb-emoji" data-emoji="'+e+'">'+e+'</button>';
   });
-
-  ["sat","sun"].forEach((day,ci)=>{
-    state.activities.filter(a=>a.day===day).forEach(a=>{
-      const s = blockIdx(a.blocks[0]);
-      const e = blockIdx(a.blocks[a.blocks.length-1]);
-      h += renderActCard(a, ci+2, s, e);
-    });
+  h += '</div>';
+  h += '<div class="fld-label">你叫什么</div>';
+  h += '<input class="field" id="gMe" maxlength="8" placeholder="群里显示的名字" value="'+esc(d.meName)+'">';
+  h += '<div class="fld-label">还有谁（可跳过，之后再加）</div>';
+  h += '<div class="mlist" id="gFriends">';
+  d.friends.forEach((f,i)=>{
+    h += '<div class="mitem"><span class="avatar" style="background:'+PALETTE[(i+1)%PALETTE.length]+'">'+esc((f||"?").slice(0,1))+'</span>'+
+         '<span class="nm">'+esc(f || "（空）")+'</span>'+
+         '<button class="del" data-action="onb-rmfriend" data-i="'+i+'">×</button></div>';
   });
-
-  h += '</div></section>';
+  h += '</div>';
+  h += '<div class="member-add"><input class="field sm" id="gNewFriend" maxlength="8" placeholder="加一个人"><button data-action="onb-addfriend">添加</button></div>';
+  h += '<button class="primary" style="margin-top:22px" data-action="onb-do-create">创建群组</button>';
+  h += '</div>';
   return h;
 }
 
-function renderActCard(a, col, s, e){
-  const mine = myStatusOf(a);
-  const joiners = Object.keys(a.joined).filter(pid =>
-    Object.values(a.joined[pid]).some(v => v==="in" || v==="maybe")
+function renderOnbJoin(){
+  return '<div class="onb onb-form">'+
+    '<button class="back" data-action="onb-back">←</button>'+
+    '<h1>加入群组</h1>'+
+    '<p class="lead" style="margin-bottom:0">正式版里，朋友发你的邀请链接点开就是这一步。</p>'+
+    '<div class="fld-label">邀请码</div>'+
+    '<input class="field" id="joinCode" maxlength="8" placeholder="比如：WEEKEND">'+
+    '<button class="primary" style="margin-top:20px" data-action="onb-do-join">加入</button>'+
+    '<div class="footer-note" style="margin-top:14px">演示版：随便填 3 个字符就能进示例群</div>'+
+  '</div>';
+}
+
+/* ================= 主界面 ================= */
+function renderApp(){
+  return '<div class="screen">'+
+    renderTopbar()+
+    renderViewTabs()+
+    renderCalendar()+
+    '<div class="footer-note">演示版 · 数据只存在这台设备的浏览器里<br>'+
+    '<button data-action="reset">重置演示</button></div>'+
+  '</div>';
+}
+
+function renderTopbar(){
+  const g = group(), m = me();
+  const pending = activities().filter(a=>!a.joined || !a.joined[state.meId]).length;
+  let h = '<header class="topbar"><div class="topbar-left">';
+  h += '<div class="brand">周末活动小助手 <span class="demo-tag">DEMO</span></div>';
+  h += '<div class="subline">';
+  h += '<button class="group-chip" data-action="open-group"><span>'+g.emoji+' '+esc(g.name)+'</span><span>· '+g.members.length+'人</span></button>';
+  if(pending>0) h += '<span class="pending-note">'+pending+' 个局待回</span>';
+  h += '</div></div>';
+  h += '<button class="me-chip" data-action="open-me">'+avatarHTML(m)+'<span class="nm">'+esc(m.name)+'</span></button>';
+  h += '</header>';
+  return h;
+}
+
+function renderViewTabs(){
+  const range = ui.view==="evening" ? "周一至周五 · 17:00 以后" : rangeLabel();
+  return '<div class="vtabs">'+
+    '<button class="'+(ui.view==="weekend"?"on":"")+'" data-action="view" data-v="weekend">周末</button>'+
+    '<button class="'+(ui.view==="evening"?"on":"")+'" data-action="view" data-v="evening">工作日晚上</button>'+
+  '</div>'+
+  '<div class="vmeta"><span class="range">'+range+'</span>'+
+  '<div class="zoomer"><button data-action="zoom" data-d="-1">−</button><button data-action="zoom" data-d="1">＋</button></div>'+
+  '</div>';
+}
+
+function rangeLabel(){
+  const ds = dayList();
+  if(!ds.length) return "";
+  return fmtMD(ds[0])+" – "+fmtMD(ds[ds.length-1]);
+}
+
+function pxPerHour(){
+  const base = ui.view==="evening" ? 54 : 36;
+  return Math.round(base * ui.zoom);
+}
+
+/* ================= 日历 ================= */
+function renderCalendar(){
+  const days = dayList();
+  const [rMin,rMax] = dayRange();
+  const totalMin = rMax - rMin;
+  const pxh = pxPerHour();
+  const bodyH = Math.round(totalMin/60*pxh);
+  const gutter = 46;
+  const isScroll = ui.view === "evening";
+  const avail = Math.min(492, window.innerWidth - 28) - gutter;
+  const colW = isScroll ? Math.max(138, Math.floor((avail - 2)/3)) : 0;
+  const innerW = isScroll ? gutter + colW*days.length : 0;
+
+  let h = '<div class="cal" data-scroll="'+(isScroll?"1":"0")+'"><div class="cal-scroll"><div class="cal-inner"'+(isScroll?' style="width:'+innerW+'px"':'')+'>';
+  h += '<div class="cal-head"><div class="cal-corner"></div>';
+  days.forEach(d=>{
+    h += '<div class="cal-dayhead '+(isToday(d)?"today":"")+'"'+(isScroll?' style="width:'+colW+'px"':'')+'>'+
+         '<b>'+WEEK_CN[d.getDay()].replace("周","")+'</b><span>'+(isToday(d)?"今天":fmtMD(d))+'</span></div>';
+  });
+  h += '</div>';
+
+  h += '<div class="cal-body" style="height:'+bodyH+'px">';
+  h += '<div class="gutter" style="height:'+bodyH+'px">';
+  BANDS.forEach(b=>{
+    if(b.e <= rMin || b.s >= rMax) return;
+    if(b.s < rMin) return; /* 起点在视图外的时段不显示标签 */
+    const top = (Math.max(b.s,rMin)-rMin)/totalMin*100;
+    h += '<div class="g-band" data-kind="'+b.kind+'" style="top:'+top+'%">'+b.name+'</div>';
+  });
+  const step = ui.zoom >= 1.4 ? 60 : (ui.zoom <= 0.85 ? 120 : 60);
+  for(let m=Math.ceil((rMin+1)/60)*60; m<rMax; m+=step){
+    const top = (m-rMin)/totalMin*100;
+    h += '<div class="g-hour" style="top:'+top+'%">'+Math.floor(m/60)+'</div>';
+  }
+  h += '</div>';
+
+  days.forEach((d, di)=>{
+    const key = ymd(d);
+    const dayActs = activities().filter(a=>a.date===key);
+    const lanes = layoutLanes(dayActs);
+    h += '<div class="daycol" data-date="'+key+'"'+(isScroll?' style="width:'+colW+'px;height:'+bodyH+'px"':' style="height:'+bodyH+'px"')+'>';
+
+    BANDS.forEach(b=>{
+      if(b.e <= rMin || b.s >= rMax) return;
+      const s = Math.max(b.s,rMin), e = Math.min(b.e,rMax);
+      const top = (s-rMin)/totalMin*100, hh = (e-s)/totalMin*100;
+      h += '<div class="band" data-kind="'+b.kind+'" style="top:'+top+'%;height:'+hh+'%"></div>';
+      h += '<div class="band-line" style="top:'+top+'%"></div>';
+    });
+    for(let m=Math.ceil(rMin/60)*60; m<rMax; m+=60){
+      h += '<div class="hourline" style="top:'+((m-rMin)/totalMin*100)+'%"></div>';
+    }
+    if(isToday(d)){
+      const now = new Date();
+      const nowMin = now.getHours()*60 + now.getMinutes();
+      if(nowMin>=rMin && nowMin<=rMax) h += '<div class="nowline" style="top:'+((nowMin-rMin)/totalMin*100)+'%"></div>';
+    }
+    dayActs.forEach(a=>{ h += renderCard(a, lanes, rMin, rMax); });
+    if(!dayActs.length && di===0) h += '<div class="emptyhint">按住拖动<br>选个时间</div>';
+
+    if(ui.sel && ui.sel.date===key){
+      const s = Math.min(ui.sel.a, ui.sel.b), e = Math.max(ui.sel.a, ui.sel.b);
+      const top = (s-rMin)/totalMin*100, hh = (e-s)/totalMin*100;
+      h += '<div class="selmask" style="top:'+top+'%;height:'+hh+'%"></div>';
+      h += '<div class="seltag" style="top:'+(top+hh/2)+'%">'+fmtTime(s)+'–'+fmtTime(e)+'</div>';
+    }
+    h += '</div>';
+  });
+  h += '</div></div></div></div>';
+  return h;
+}
+
+function layoutLanes(acts){
+  const sorted = acts.slice().sort((a,b)=>a.start-b.start);
+  const ends = [];
+  for(const a of sorted){
+    let lane = ends.findIndex(e => e <= a.start);
+    if(lane === -1){ lane = ends.length; ends.push(0); }
+    ends[lane] = a.end;
+    a._lane = lane;
+  }
+  return Math.max(1, ends.length);
+}
+
+function renderCard(a, lanes, rMin, rMax){
+  const totalMin = rMax - rMin;
+  const top = (a.start-rMin)/totalMin*100;
+  const hh = (a.end-a.start)/totalMin*100;
+  const compact = (a.end-a.start) <= 60 ? "1" : "0";
+  const lane = a._lane || 0;
+  const left = "calc(2px + " + lane + " * (100% - 4px) / " + lanes + ")";
+  const width = "calc((100% - 4px) / " + lanes + " - 2px)";
+
+  const joiners = Object.keys(a.joined||{}).filter(id =>
+    Object.values(a.joined[id]).some(v=>v==="in"||v==="maybe")
   );
   const shown = joiners.slice(0,3);
   const more = joiners.length - shown.length;
+  let pile = shown.map(id=>avatarHTML(member(id))).join("");
+  if(more>0) pile += '<span class="more">+'+more+'</span>';
 
-  let pile = shown.map(id=>avatarHTML(person(id))).join("");
-  if(more > 0) pile += '<span class="more">+'+more+'</span>';
+  const st = myStatus(a);
+  let dot = st==="in" ? '<span class="dot in"></span>' : (st==="maybe" ? '<span class="dot maybe"></span>' : "");
 
-  let dot = "";
-  if(mine === "in") dot = '<span class="st-dot in"></span>';
-  else if(mine === "maybe") dot = '<span class="st-dot maybe"></span>';
+  /* 跨多个环节时，在卡片里显示每段的人数和我的状态 */
+  const parts = partsOf(a);
+  let segs = "";
+  if(parts.length >= 2 && (a.end - a.start) >= 150){
+    segs = '<div class="csegs">' + parts.map(p=>{
+      let ins = 0, mys = 0;
+      Object.keys(a.joined||{}).forEach(id=>{
+        const s = a.joined[id][p.id];
+        if(s==="in") ins++;
+        else if(s==="maybe") mys++;
+      });
+      const mineSt = (a.joined && a.joined[state.meId]) ? a.joined[state.meId][p.id] : "";
+      const cls = mineSt==="in" ? " mi" : (mineSt==="maybe" ? " mm" : "");
+      return '<div class="cseg'+cls+'"><span>'+p.name+'</span><b>'+(ins||"—")+'</b>'+(mys?'<i>+'+mys+'?</i>':'')+'</div>';
+    }).join("") + '</div>';
+  }
 
-  const span = e - s + 1;
-  const noteHTML = (span >= 2 && a.note) ? '<div class="act-note">'+esc(a.note)+'</div>' : '';
-  const segsHTML = span >= 3 ? renderMiniSegs(a) : '';
-
-  return '<article class="act" data-action="open-act" data-id="'+a.id+'" data-span="'+span+'" '+
-    'style="grid-row:'+(s+1)+'/'+(e+2)+';grid-column:'+col+';--c:'+a.color+'">'+
+  return '<article class="card" data-action="open-act" data-id="'+a.id+'" data-compact="'+compact+'" '+
+    'style="top:'+top+'%;height:calc('+hh+'% - 2px);left:'+left+';width:'+width+';--c:'+a.color+'">'+
       dot+
-      '<div class="act-top"><span class="act-emoji">'+a.emoji+'</span><span class="act-name">'+esc(a.title)+'</span></div>'+
-      (span >= 2 && a.place ? '<div class="act-place">'+esc(a.place)+'</div>' : '')+
-      noteHTML+
-      segsHTML+
-      '<div class="act-bottom"><div class="pile">'+pile+'</div></div>'+
+      '<div class="ct"><span class="ce">'+a.emoji+'</span><span class="cn">'+esc(a.title)+'</span></div>'+
+      '<div class="ctime">'+fmtTime(a.start)+'–'+fmtTime(a.end)+'</div>'+
+      (a.place ? '<div class="cplace">'+esc(a.place)+'</div>' : '')+
+      segs+
+      '<div class="cfoot"><div class="pile">'+pile+'</div></div>'+
     '</article>';
 }
 
-/* 卡片里的迷你分时段人数（窄列竖排） */
-function renderMiniSegs(a){
-  const rows = a.blocks.map(bid=>{
-    const b = blockBy(bid);
-    let ins = 0, maybes = 0;
-    Object.keys(a.joined).forEach(pid=>{
-      const st = a.joined[pid][bid];
-      if(st === "in") ins++;
-      else if(st === "maybe") maybes++;
-    });
-    const mine = (a.joined[state.meId] || {})[bid];
-    let cls = "";
-    if(mine === "in") cls = " mi-in";
-    else if(mine === "maybe") cls = " mi-maybe";
-    const tail = maybes ? '<span class="mq">+'+maybes+'?</span>' : "";
-    return '<div class="mseg'+cls+'"><span class="ml">'+b.label+'</span><span class="mn">'+(ins || "—")+'</span>'+tail+'</div>';
-  });
-  return '<div class="mini-segs">'+rows.join("")+'</div>';
-}
-
-function myStatusOf(a){
-  const m = a.joined[state.meId];
-  if(!m) return null;
-  const vals = Object.values(m);
-  if(vals.includes("in")) return "in";
-  if(vals.includes("maybe")) return "maybe";
-  if(a.blocks.every(b => m[b] === "out")) return "out";
-  return null;
-}
-
-/* 卡片上的分时段参与概览 */
-function renderActSegs(a){
-  const rows = a.blocks.map(bid=>{
-    const b = blockBy(bid);
-    let ins = 0, maybes = 0;
-    Object.keys(a.joined).forEach(pid=>{
-      const st = a.joined[pid][bid];
-      if(st === "in") ins++;
-      else if(st === "maybe") maybes++;
-    });
-    const mine = (a.joined[state.meId] || {})[bid];
-    let cls = "";
-    if(mine === "in") cls = " mine-in";
-    else if(mine === "maybe") cls = " mine-maybe";
-    else if(mine === "out") cls = " mine-out";
-    const num = ins ? String(ins) : "—";
-    const tail = maybes ? '<span class="q">+'+maybes+'?</span>' : "";
-    return '<span class="seg'+cls+'"><span class="sl">'+b.label+'</span><span class="sn">'+num+'</span>'+tail+'</span>';
-  });
-  const silent = Math.max(0, PEOPLE.length - Object.keys(a.joined).length);
-  if(silent > 0) rows.push('<span class="seg ghost">还差 '+silent+' 人</span>');
-  return '<div class="act-segs">'+rows.join("")+'</div>';
-}
-
-/* ---------------- 选择浮条 ---------------- */
-function renderSelectBar(){
-  const bar = document.getElementById("selectbar");
-  if(!sel){ bar.classList.remove("on"); bar.innerHTML=""; return; }
-
-  const lo = Math.min(sel.start, sel.end);
-  const hi = Math.max(sel.start, sel.end);
-  const blocks = BLOCKS.slice(lo, hi+1).map(b=>b.id);
-  const n = hi-lo+1;
-
-  bar.classList.add("on");
-  bar.innerHTML =
-    '<div class="txt">'+
-      '<div class="t1">'+spanText(sel.day, blocks)+'</div>'+
-      '<div class="t2">'+n+' 个时段 · '+spanTimeText(blocks)+'</div>'+
-    '</div>'+
-    '<button class="cancel" data-action="clear-sel">取消</button>'+
-    '<button class="go" data-action="new-act">发起活动</button>';
-}
-
-/* ---------------- 抽屉 ---------------- */
-function openSheet(mode, actId){
-  sheetMode = mode;
-  activeActId = actId || null;
+/* ================= 抽屉 ================= */
+function openSheet(type, id){
+  ui.sheet = type; ui.actId = id || null;
+  if(type==="detail") ui.joinDraft = null;
   document.getElementById("scrim").classList.add("on");
   document.getElementById("sheet").classList.add("on");
   renderSheet();
 }
 function closeSheet(){
-  sheetMode = null; activeActId = null; draft = null;
+  ui.sheet = null; ui.actId = null; ui.joinDraft = null; ui.draft = null;
   document.getElementById("scrim").classList.remove("on");
   document.getElementById("sheet").classList.remove("on");
 }
-
+let lastSheetKey = "";
 function renderSheet(){
-  const sheet = document.getElementById("sheet");
-  if(!sheetMode){ sheet.innerHTML = ""; lastSheetMode = null; return; }
+  const el = document.getElementById("sheet");
+  if(!ui.sheet){ el.innerHTML=""; lastSheetKey=""; return; }
+  const prev = el.querySelector(".sheet-body");
+  const key = ui.sheet + (ui.actId||"");
+  const keep = (lastSheetKey === key && prev) ? prev.scrollTop : 0;
 
-  const prevBody = sheet.querySelector(".sheet-body");
-  const keepScroll = (lastSheetMode === sheetMode && prevBody) ? prevBody.scrollTop : 0;
+  let inner = "";
+  if(ui.sheet==="detail") inner = renderDetail(actById(ui.actId));
+  else if(ui.sheet==="create") inner = renderCreate();
+  else if(ui.sheet==="group") inner = renderGroupSheet();
+  else if(ui.sheet==="me") inner = renderMeSheet();
 
-  let body = "";
-  if(sheetMode==="detail") body = renderDetail(actById(activeActId));
-  else if(sheetMode==="create") body = renderCreate();
-  else if(sheetMode==="me") body = renderMePicker();
-  else if(sheetMode==="group") body = renderGroup();
-
-  sheet.innerHTML = '<div class="sheet-handle"></div>' + body;
-
-  const nextBody = sheet.querySelector(".sheet-body");
-  if(nextBody) nextBody.scrollTop = keepScroll;
-  lastSheetMode = sheetMode;
+  el.innerHTML = '<div class="sheet-handle"></div>' + inner;
+  const body = el.querySelector(".sheet-body");
+  if(body) body.scrollTop = keep;
+  lastSheetKey = key;
 }
 
-/* ---------- 活动详情 ---------- */
+/* ---------------- 活动详情 ---------------- */
 function renderDetail(a){
   if(!a) return "";
-  const entries = Object.keys(a.joined);
-  const active = entries.filter(pid => Object.values(a.joined[pid]).some(v => v==="in" || v==="maybe"));
-  let inCount = 0, maybeCount = 0;
-  active.forEach(pid=>{
-    const vals = Object.values(a.joined[pid]);
-    if(vals.includes("in")) inCount++;
-    else maybeCount++;
-  });
-  const host = person(a.host);
+  const parts = participationParts(a);
+  const perPart = parts.length > 1;
+  const host = member(a.hostId);
 
-  let h = '<div class="sheet-head">'+
-    '<div class="sheet-title"><span class="em">'+a.emoji+'</span>'+esc(a.title)+'</div>'+
-    '<button class="x" data-action="close-sheet">×</button>'+
-  '</div>';
+  if(!ui.joinDraft){
+    const d = {};
+    parts.forEach(p=>{ d[p.id] = statusOf(a, state.meId, p.id) || ""; });
+    ui.joinDraft = d;
+  }
+  const draft = ui.joinDraft;
+  const dirty = parts.some(p => (draft[p.id]||"") !== (statusOf(a, state.meId, p.id)||""));
 
+  const d = parseYmd(a.date);
+  let h = '<div class="sheet-head"><div class="sheet-title">'+a.emoji+' '+esc(a.title)+'</div>'+
+          '<button class="x" data-action="close-sheet">×</button></div>';
   h += '<div class="sheet-body">';
-  h += '<div class="meta-row"><span class="ic">🕐</span><span>'+spanText(a.day, a.blocks)+'<br><span style="color:var(--ink3);font-size:12px">'+spanTimeText(a.blocks)+'</span></span></div>';
+  h += '<div class="meta-row"><span class="ic">🕐</span><span>'+WEEK_CN[d.getDay()]+' '+fmtMD(d)+'　'+fmtTime(a.start)+' – '+fmtTime(a.end)+'</span></div>';
   h += '<div class="meta-row"><span class="ic">👤</span><span>'+esc(host.name)+' 发起</span></div>';
   if(a.place) h += '<div class="meta-row"><span class="ic">📍</span><span>'+esc(a.place)+'</span></div>';
   if(a.note) h += '<div class="note">'+esc(a.note)+'</div>';
 
-  /* 谁去 */
-  h += '<div class="sec-h">谁去 · 确定 '+inCount+(maybeCount?' · 待定 '+maybeCount:'')+'</div>';
-  if(!active.length){
+  const joiners = Object.keys(a.joined||{});
+  let inN = 0, maybeN = 0;
+  joiners.forEach(id=>{
+    const vs = Object.values(a.joined[id]);
+    if(vs.includes("in")) inN++;
+    else if(vs.includes("maybe")) maybeN++;
+  });
+
+  h += '<div class="sec-h">谁去 · 确定 '+inN+(maybeN?' · 待定 '+maybeN:'')+'</div>';
+  if(!joiners.length){
     h += '<div class="empty-note">还没有人报名，你可以当第一个。</div>';
   }else{
-    a.blocks.forEach(bid=>{
-      const b = blockBy(bid);
-      const ins = [], maybes = [];
-      entries.forEach(pid=>{
-        const st = a.joined[pid][bid];
-        if(st==="in") ins.push(pid);
-        else if(st==="maybe") maybes.push(pid);
+    parts.forEach(p=>{
+      const ins = [], mys = [];
+      joiners.forEach(id=>{
+        const st = a.joined[id][p.id];
+        if(st==="in") ins.push(id);
+        else if(st==="maybe") mys.push(id);
       });
-      if(!ins.length && !maybes.length) return;
-
-      h += '<div class="bgroup"><div class="bg-head"><b>'+b.label+'</b><span>'+b.time+'</span>'+
-           '<span class="cnt">'+(ins.length+maybes.length)+' 人</span></div><div class="chips">';
-      ins.forEach(pid=>{
-        const p = person(pid);
-        h += '<span class="chip '+(pid===a.host?"host":"")+'">'+avatarHTML(p)+esc(p.name)+'</span>';
+      if(!ins.length && !mys.length) return;
+      h += '<div class="bgroup"><div class="bg-head"><b>'+p.name+'</b>'+
+           '<span>'+fmtTime(p.start)+'–'+fmtTime(p.end)+'</span>'+
+           '<span class="cnt">'+(ins.length+mys.length)+' 人</span></div><div class="chips">';
+      ins.forEach(id=>{
+        const m = member(id);
+        h += '<span class="chip '+(id===a.hostId?"host":"")+'">'+avatarHTML(m,"sm")+esc(m.name)+'</span>';
       });
-      maybes.forEach(pid=>{
-        const p = person(pid);
-        h += '<span class="chip maybe">'+avatarHTML(p)+esc(p.name)+'<span class="q">待定</span></span>';
+      mys.forEach(id=>{
+        const m = member(id);
+        h += '<span class="chip maybe">'+avatarHTML(m,"sm")+esc(m.name)+'<span class="q">待定</span></span>';
       });
       h += '</div></div>';
     });
-
-    const silent = PEOPLE.filter(p=>!a.joined[p.id]);
-    if(silent.length){
-      h += '<div class="silent">还没表态：'+silent.map(p=>esc(p.name)).join("、")+'</div>';
-    }
+    const silent = members().filter(m=>!a.joined || !a.joined[m.id]);
+    if(silent.length) h += '<div class="silent">还没表态：'+silent.map(m=>esc(m.name)).join("、")+'</div>';
   }
 
-  /* 我的选择 */
-  h += '<div class="sec-h">我要参加哪些时段？</div>';
-  h += '<div class="legend"><span class="lg in">参加</span><span class="lg maybe">待定</span><span class="lg out">不去</span><span class="lg none">没表态</span></div>';
-  const mine = a.joined[state.meId] || {};
-
-  a.blocks.forEach(bid=>{
-    const b = blockBy(bid);
-    const st = mine[bid] || "";
-    h += '<div class="me-row">'+
-      '<div class="lbl"><div class="l1">'+b.label+'</div><div class="l2">'+b.time+'</div></div>'+
-      '<div class="btn-grp">'+
-        '<button class="tbtn '+(st==="in"?"on-in":"")+'" data-action="set-status" data-id="'+a.id+'" data-block="'+bid+'" data-status="in">参加</button>'+
-        '<button class="tbtn '+(st==="maybe"?"on-maybe":"")+'" data-action="set-status" data-id="'+a.id+'" data-block="'+bid+'" data-status="maybe">待定</button>'+
-        '<button class="tbtn '+(st==="out"?"on-out":"")+'" data-action="set-status" data-id="'+a.id+'" data-block="'+bid+'" data-status="out">不去</button>'+
-      '</div>'+
-    '</div>';
+  h += '<div class="sec-h">'+(perPart?'我参加哪些环节？':'我去不去？')+'</div>';
+  parts.forEach(p=>{
+    const cur = draft[p.id] || "";
+    const label = perPart ? p.name : "整个活动";
+    const timeTxt = perPart ? fmtTime(p.start)+"–"+fmtTime(p.end) : fmtTime(a.start)+"–"+fmtTime(a.end);
+    h += '<div class="joinrow"><div class="jl"><div class="j1">'+label+'</div><div class="j2">'+timeTxt+'</div></div>'+
+      '<div class="tg">'+
+        '<button class="tbtn '+(cur==="in"?"on-in":"")+'" data-action="jset" data-p="'+p.id+'" data-s="in">参加</button>'+
+        '<button class="tbtn '+(cur==="maybe"?"on-maybe":"")+'" data-action="jset" data-p="'+p.id+'" data-s="maybe">待定</button>'+
+        '<button class="tbtn '+(cur==="out"?"on-out":"")+'" data-action="jset" data-p="'+p.id+'" data-s="out">不去</button>'+
+      '</div></div>';
   });
+  if(parts.length>1) h += '<button class="all-in" data-action="jall" data-v="in">全部参加</button>';
 
-  h += '<button class="all-in" data-action="all-in" data-id="'+a.id+'">全部时段都参加</button>';
+  h += '<div style="display:flex;gap:8px;margin-top:12px">'+
+       '<button class="ghost-btn" style="margin-top:0;padding:10px" data-action="copy-invite" data-id="'+a.id+'">复制邀请文案</button>';
+  const silentList = members().filter(m=>m.id!==state.meId && (!a.joined || !a.joined[m.id]));
+  if(silentList.length) h += '<button class="ghost-btn" style="margin-top:0;padding:10px" data-action="nudge" data-id="'+a.id+'">催一下 '+silentList.length+' 人</button>';
+  h += '</div></div>';
 
-  const silentList = PEOPLE.filter(p=>!a.joined[p.id] && p.id !== state.meId);
-  h += '<div class="share-row">';
-  h += '<button class="ghost-btn" data-action="copy-invite" data-id="'+a.id+'">复制邀请文案</button>';
-  if(silentList.length){
-    h += '<button class="ghost-btn" data-action="nudge" data-id="'+a.id+'">催一下 '+silentList.length+' 人</button>';
-  }
-  h += '</div>';
-
-  h += '</div>';
+  h += '<div class="savebar '+(dirty?"dirty":"")+'">'+
+    '<span class="dirty">有未保存的修改</span>'+
+    '<button class="cc" data-action="close-sheet">取消</button>'+
+    '<button class="sv" data-action="jsave" '+(dirty?"":"disabled")+'>确定</button>'+
+  '</div>';
   return h;
 }
 
-/* ---------- 创建活动 ---------- */
+/* ---------------- 创建活动 ---------------- */
 function renderCreate(){
-  if(!draft) return "";
+  const d = ui.draft;
+  if(!d) return "";
+  const parts = partsOf({start:d.start, end:d.end});
+  const canPerPart = parts.length >= 2;
+  const date = parseYmd(d.date);
 
-  const blocks = draft.blocks;
-  let h = '<div class="sheet-head">'+
-    '<div class="sheet-title">发起新活动</div>'+
-    '<button class="x" data-action="close-sheet">×</button>'+
-  '</div>';
-
+  let h = '<div class="sheet-head"><div class="sheet-title">发起新活动</div>'+
+          '<button class="x" data-action="close-sheet">×</button></div>';
   h += '<div class="sheet-body">';
-  h += '<div class="span-pill">🕐 '+spanText(draft.day, blocks)+'</div>';
-  h += '<div style="font-size:11.5px;color:var(--ink3);margin:4px 0 0">'+spanTimeText(blocks)+' · 共 '+blocks.length+' 个时段</div>';
-
-  h += '<div class="form-label">活动名称</div>';
-  h += '<input class="field" id="fTitle" maxlength="20" placeholder="比如：老王火锅局" autocomplete="off">';
-
-  h += '<div class="form-label">图标</div>';
-  h += '<div class="emoji-row" id="fEmoji">';
-  ["🍲","🍜","🍢","🍻","🎲","🎬","🍁","🏸","🥾","🎮","☕","🎤"].forEach(e=>{
-    h += '<button class="emoji-pick '+(draft.emoji===e?"on":"")+'" data-action="pick-emoji" data-emoji="'+e+'">'+e+'</button>';
+  h += '<div class="span-box"><div class="big">'+fmtTime(d.start)+' – '+fmtTime(d.end)+'</div>'+
+       '<div class="sub">'+WEEK_CN[date.getDay()]+' '+fmtMD(date)+' · 共 '+fmtDur(d.end-d.start)+'</div></div>';
+  h += '<div class="time-edit">'+
+    '<div class="tgrp"><span class="lab">开始</span><button data-action="tstep" data-k="start" data-v="-15">−</button>'+
+      '<span class="val">'+fmtTime(d.start)+'</span><button data-action="tstep" data-k="start" data-v="15">＋</button></div>'+
+    '<div class="tgrp"><span class="lab">结束</span><button data-action="tstep" data-k="end" data-v="-15">−</button>'+
+      '<span class="val">'+fmtTime(d.end)+'</span><button data-action="tstep" data-k="end" data-v="15">＋</button></div>'+
+  '</div>';
+  h += '<div class="fld-label">活动名称</div>';
+  h += '<input class="field" id="fTitle" maxlength="16" placeholder="比如：老王火锅局" value="'+esc(d.title||"")+'">';
+  h += '<div class="fld-label">图标</div><div class="emoji-row" id="fEmoji">';
+  EMOJIS.forEach(e=>{
+    h += '<button class="emoji-pick '+(d.emoji===e?"on":"")+'" data-action="pick-emoji" data-emoji="'+e+'">'+e+'</button>';
   });
   h += '</div>';
-
-  h += '<div class="form-label">地点（可选）</div>';
-  h += '<input class="field sm" id="fPlace" maxlength="24" placeholder="比如：蜀大侠 · 国贸店" autocomplete="off">';
-
-  h += '<div class="form-label">补充说明（可选）</div>';
-  h += '<input class="field sm" id="fNote" maxlength="60" placeholder="比如：下午去旁边桌游店" autocomplete="off">';
-
-  h += '<button class="primary" data-action="create-act">发起活动，喊人报名</button>';
-  h += '<div class="footer-note" style="margin-top:14px">发起后，群里的人点进活动就能选自己参加哪几段。</div>';
+  h += '<div class="fld-label">地点（可选）</div>';
+  h += '<input class="field sm" id="fPlace" maxlength="20" placeholder="比如：蜀大侠 · 国贸店" value="'+esc(d.place||"")+'">';
+  h += '<div class="fld-label">补充说明（可选）</div>';
+  h += '<input class="field sm" id="fNote" maxlength="50" placeholder="比如：下午去旁边桌游店" value="'+esc(d.note||"")+'">';
+  if(canPerPart){
+    h += '<div class="switch-row"><div class="sl"><div class="s1">按环节分别报名</div>'+
+         '<div class="s2">'+parts.map(p=>p.name).join(" / ")+'，每个人可以只参加其中几段</div></div>'+
+         '<button class="sw '+(d.perPart?"on":"")+'" data-action="toggle-perpart"></button></div>';
+  }
+  h += '<button class="primary" style="margin-top:18px" data-action="do-create">发起活动，喊人报名</button>';
   h += '</div>';
   return h;
 }
 
-/* ---------- 身份选择 ---------- */
-function renderMePicker(){
-  let h = '<div class="sheet-head">'+
-    '<div class="sheet-title">你是谁？</div>'+
-    '<button class="x" data-action="close-sheet">×</button>'+
-  '</div>';
+function fmtDur(min){
+  const h = Math.floor(min/60), m = min%60;
+  if(h && m) return h+" 小时 "+m+" 分";
+  if(h) return h+" 小时";
+  return m+" 分钟";
+}
+
+/* ---------------- 群组 / 身份 ---------------- */
+function renderGroupSheet(){
+  const g = group();
+  let h = '<div class="sheet-head"><div class="sheet-title">'+g.emoji+' '+esc(g.name)+'</div>'+
+          '<button class="x" data-action="close-sheet">×</button></div>';
   h += '<div class="sheet-body">';
-  h += '<div class="sub-note">正式版里，这一步由微信身份自动完成。demo 里选一个人，体验他的视角。</div>';
+  h += '<div class="sub-note">群里固定这几个人。发活动不用每次重新找人，一次建群，之后一直用。</div>';
   h += '<div class="plist">';
-  PEOPLE.forEach(p=>{
-    h += '<button class="prow '+(p.id===state.meId?"on":"")+'" data-action="set-me" data-id="'+p.id+'">'+
-      avatarHTML(p) + '<span class="nm">'+esc(p.name)+'</span>'+
-      (p.id===state.meId?'<span class="tick">当前</span>':'')+
-    '</button>';
+  g.members.forEach(m=>{
+    h += '<div class="prow">'+avatarHTML(m)+'<span class="nm">'+esc(m.name)+'</span>'+
+         (m.id===state.meId?'<span class="tick">我</span>':'')+'</div>';
+  });
+  h += '</div>';
+  h += '<button class="all-in" style="margin-top:12px" data-action="fake-invite">＋ 邀请朋友加入群组</button>';
+  h += '<button class="all-in" style="margin-top:8px" data-action="new-group">＋ 新建另一个群组</button>';
+  h += '</div>';
+  return h;
+}
+
+function renderMeSheet(){
+  const g = group();
+  let h = '<div class="sheet-head"><div class="sheet-title">你是谁？</div>'+
+          '<button class="x" data-action="close-sheet">×</button></div>';
+  h += '<div class="sheet-body">';
+  h += '<div class="sub-note">正式版里这一步由微信身份自动带过。demo 里选一个人，体验他的视角。</div>';
+  h += '<div class="plist">';
+  g.members.forEach(m=>{
+    h += '<button class="prow '+(m.id===state.meId?"on":"")+'" data-action="set-me" data-id="'+m.id+'">'+
+      avatarHTML(m)+'<span class="nm">'+esc(m.name)+'</span>'+
+      (m.id===state.meId?'<span class="tick">当前</span>':'')+'</button>';
   });
   h += '</div></div>';
   return h;
 }
 
-/* ---------- 群组 ---------- */
-function renderGroup(){
-  let h = '<div class="sheet-head">'+
-    '<div class="sheet-title"><span class="em">'+state.groupEmoji+'</span>'+esc(state.groupName)+'</div>'+
-    '<button class="x" data-action="close-sheet">×</button>'+
-  '</div>';
-  h += '<div class="sheet-body">';
-  h += '<div class="sub-note">群里固定这几个人。发活动时不用每次重新找人，一次拉群，之后一直用。</div>';
-  h += '<div class="plist">';
-  PEOPLE.forEach(p=>{
-    h += '<div class="prow">'+avatarHTML(p)+'<span class="nm">'+esc(p.name)+'</span></div>';
-  });
-  h += '</div>';
-  h += '<button class="all-in" style="margin-top:12px" data-action="fake-invite">＋ 邀请朋友加入群组</button>';
-  h += '</div>';
-  return h;
+/* ---------------- 底部条 ---------------- */
+function renderBar(){
+  const el = document.getElementById("bar");
+  if(!ui.sel){ el.classList.remove("on"); el.innerHTML=""; return; }
+  const a = Math.min(ui.sel.a, ui.sel.b), b = Math.max(ui.sel.a, ui.sel.b);
+  const d = parseYmd(ui.sel.date);
+  el.classList.add("on");
+  el.innerHTML = '<div class="txt"><div class="t1">'+fmtTime(a)+' – '+fmtTime(b)+'</div>'+
+    '<div class="t2">'+WEEK_CN[d.getDay()]+' '+fmtMD(d)+' · '+fmtDur(b-a)+'</div></div>'+
+    '<button class="cancel" data-action="clear-sel">取消</button>'+
+    '<button class="go" data-action="new-act">发起活动</button>';
 }
 
-/* ---------------- 事件 ---------------- */
+/* ---------------- 渲染入口 ---------------- */
+function render(){
+  const screen = document.getElementById("screen");
+  if(!state.onboarded || !group()) screen.innerHTML = renderOnboarding();
+  else screen.innerHTML = renderApp();
+  renderBar();
+  if(ui.sheet) renderSheet();
+}
+
+/* ================= 交互 ================= */
 document.addEventListener("click", (e)=>{
   const el = e.target.closest("[data-action]");
   if(!el) return;
-  const action = el.dataset.action;
+  const a = el.dataset.action;
 
-  if(action==="dismiss-hint"){
-    state.hintDismissed = true; saveState(); renderHint(); return;
-  }
-  if(action==="reset"){
-    if(confirm("重置为演示数据？你刚才的报名会清掉。")){
-      state = clone(SEED); saveState(); sel=null; closeSheet(); renderAll(); toast("已重置");
-    }
+  if(a==="onb-create"){ ui.onbStep="create"; render(); return; }
+  if(a==="onb-join"){ ui.onbStep="join"; render(); return; }
+  if(a==="onb-back"){ ui.onbStep="welcome"; render(); return; }
+  if(a==="onb-emoji"){
+    ensureOnbDraft().emoji = el.dataset.emoji;
+    document.querySelectorAll("#gEmoji .emoji-pick").forEach(b=>b.classList.toggle("on", b.dataset.emoji===el.dataset.emoji));
     return;
   }
-  if(action==="open-act"){
-    openSheet("detail", el.dataset.id); return;
+  if(a==="onb-rmfriend"){ ensureOnbDraft().friends.splice(+el.dataset.i,1); render(); return; }
+  if(a==="onb-addfriend"){
+    const inp = document.getElementById("gNewFriend");
+    const v = (inp.value||"").trim();
+    if(!v) return;
+    ensureOnbDraft().friends.push(v);
+    render(); return;
   }
-  if(action==="close-sheet"){ closeSheet(); return; }
-  if(action==="open-me"){ openSheet("me"); return; }
-  if(action==="open-group"){ openSheet("group"); return; }
-  if(action==="fake-invite"){ toast("正式版会生成一个群组链接"); return; }
-
-  if(action==="copy-invite"){
-    const a = actById(el.dataset.id);
-    if(!a) return;
-    const t = inviteText(a);
-    copyText(t).then(ok => { if(ok) toast("邀请文案已复制，去群里粘贴"); else showCopyBox(t); });
+  if(a==="onb-do-create"){
+    const name = (document.getElementById("gName").value||"").trim() || "周末常玩组";
+    const meName = (document.getElementById("gMe").value||"").trim() || "我";
+    createGroup(name, ensureOnbDraft().emoji, meName, ensureOnbDraft().friends);
     return;
   }
-
-  if(action==="nudge"){
-    const a = actById(el.dataset.id);
-    if(!a) return;
-    const t = nudgeText(a);
-    copyText(t).then(ok => { if(ok) toast("催办文案已复制，去群里粘贴"); else showCopyBox(t); });
+  if(a==="onb-do-join"){
+    const code = (document.getElementById("joinCode").value||"").trim();
+    if(code.length < 3){ toast("邀请码至少 3 个字符"); return; }
+    createDemoGroup();
     return;
   }
 
-  if(action==="set-me"){
-    state.meId = el.dataset.id; saveState(); renderAll(); renderSheet(); return;
+  if(a==="open-group"){ openSheet("group"); return; }
+  if(a==="open-me"){ openSheet("me"); return; }
+  if(a==="set-me"){ state.meId = el.dataset.id; save(); render(); renderSheet(); return; }
+  if(a==="fake-invite"){ toast("正式版会生成群组邀请链接"); return; }
+  if(a==="new-group"){ closeSheet(); state.onboarded=false; ui.onbStep="create"; ui.onbDraft=null; render(); return; }
+
+  if(a==="view"){ ui.view = el.dataset.v; ui.sel=null; render(); return; }
+  if(a==="zoom"){
+    const d = +el.dataset.d;
+    ui.zoom = Math.min(2, Math.max(0.7, Math.round((ui.zoom + d*0.15)*100)/100));
+    render(); return;
   }
 
-  if(action==="clear-sel"){ sel = null; renderDays(); renderSelectBar(); return; }
-
-  if(action==="new-act"){
-    if(!sel) return;
-    const lo = Math.min(sel.start, sel.end), hi = Math.max(sel.start, sel.end);
-    const blocks = BLOCKS.slice(lo, hi+1).map(b=>b.id);
-    // 检查是否和已有活动冲突
-    const clash = state.activities.find(a=>a.day===sel.day && a.blocks.some(b=>blocks.includes(b)));
+  if(a==="clear-sel"){ ui.sel=null; render(); return; }
+  if(a==="new-act"){
+    if(!ui.sel) return;
+    const s = Math.min(ui.sel.a, ui.sel.b), e = Math.max(ui.sel.a, ui.sel.b);
+    if(e - s < SNAP){ toast("时间段太短了"); return; }
+    const clash = activities().find(x=>x.date===ui.sel.date && x.start < e && x.end > s);
     if(clash){ toast("和「"+clash.title+"」时间重叠了"); return; }
-    draft = { day:sel.day, blocks, emoji:"🍲" };
-    sel = null;
-    renderDays(); renderSelectBar();
+    ui.draft = { date:ui.sel.date, start:s, end:e, emoji:"🍲", title:"", place:"", note:"", perPart:true };
+    ui.sel = null;
+    render();
     openSheet("create");
     return;
   }
 
-  if(action==="pick-emoji"){
-    draft.emoji = el.dataset.emoji;
-    // 只更新选中态，避免输入框失焦重渲染
-    document.querySelectorAll("#fEmoji .emoji-pick").forEach(b=>{
-      b.classList.toggle("on", b.dataset.emoji===draft.emoji);
-    });
-    return;
-  }
-
-  if(action==="create-act"){
-    const title = (document.getElementById("fTitle").value || "").trim();
-    if(!title){ toast("先给活动起个名字"); document.getElementById("fTitle").focus(); return; }
-    const place = (document.getElementById("fPlace").value || "").trim();
-    const note  = (document.getElementById("fNote").value || "").trim();
-    const colors = ["#E8674A","#4C8C6B","#5B6CB8","#9B6BB5","#C97A2E","#3E8BA8"];
-
-    const a = {
-      id:"a"+Date.now(),
-      title, emoji:draft.emoji, color:colors[state.activities.length % colors.length],
-      day:draft.day, blocks:draft.blocks.slice(), host:state.meId,
-      place, note,
-      joined:{}
-    };
-    state.activities.push(a);
-    saveState();
-    draft = null;
-    closeSheet();
-    renderAll();
-    toast("活动已发起");
-    setTimeout(()=>openSheet("detail", a.id), 220);
-    return;
-  }
-
-  if(action==="set-status"){
-    const id = el.dataset.id, bid = el.dataset.block, st = el.dataset.status;
-    const a = actById(id); if(!a) return;
-    if(!a.joined[state.meId]) a.joined[state.meId] = {};
-    const cur = a.joined[state.meId][bid];
-    if(cur === st) delete a.joined[state.meId][bid];
-    else a.joined[state.meId][bid] = st;
-    if(!Object.keys(a.joined[state.meId]).length) delete a.joined[state.meId];
-    saveState();
-    renderDays();
+  if(a==="open-act"){ openSheet("detail", el.dataset.id); return; }
+  if(a==="close-sheet"){ closeSheet(); return; }
+  if(a==="jset"){
+    if(!ui.joinDraft) return;
+    const p = el.dataset.p, s = el.dataset.s;
+    ui.joinDraft[p] = (ui.joinDraft[p]===s) ? "" : s;
     renderSheet();
     return;
   }
+  if(a==="jall"){
+    if(!ui.joinDraft) return;
+    Object.keys(ui.joinDraft).forEach(k=>{ ui.joinDraft[k] = el.dataset.v; });
+    renderSheet(); return;
+  }
+  if(a==="jsave"){
+    const act = actById(ui.actId);
+    if(!act) return;
+    if(!act.joined) act.joined = {};
+    const rec = {};
+    Object.keys(ui.joinDraft).forEach(k=>{ if(ui.joinDraft[k]) rec[k] = ui.joinDraft[k]; });
+    if(Object.keys(rec).length) act.joined[state.meId] = rec;
+    else delete act.joined[state.meId];
+    save();
+    ui.joinDraft = null;
+    closeSheet();
+    render();
+    toast("已保存");
+    return;
+  }
 
-  if(action==="all-in"){
-    const a = actById(el.dataset.id); if(!a) return;
-    a.joined[state.meId] = {};
-    a.blocks.forEach(b=>{ a.joined[state.meId][b] = "in"; });
-    saveState();
-    renderDays(); renderSheet(); toast("已全部参加");
+  if(a==="pick-emoji"){
+    ui.draft.emoji = el.dataset.emoji;
+    document.querySelectorAll("#fEmoji .emoji-pick").forEach(b=>b.classList.toggle("on", b.dataset.emoji===el.dataset.emoji));
+    return;
+  }
+  if(a==="tstep"){
+    const k = el.dataset.k, v = +el.dataset.v;
+    const d = ui.draft;
+    d.title = document.getElementById("fTitle")?.value || d.title;
+    d.place = document.getElementById("fPlace")?.value || d.place;
+    d.note  = document.getElementById("fNote")?.value || d.note;
+    if(k==="start"){
+      d.start = Math.max(DAY_MIN, d.start + v);
+      if(d.end - d.start < SNAP) d.end = d.start + SNAP;
+      if(d.end > DAY_MAX) d.end = DAY_MAX;
+    }else{
+      d.end = Math.min(DAY_MAX, d.end + v);
+      if(d.end - d.start < SNAP) d.start = d.end - SNAP;
+      if(d.start < DAY_MIN) d.start = DAY_MIN;
+    }
+    renderSheet();
+    return;
+  }
+  if(a==="toggle-perpart"){ ui.draft.perPart = !ui.draft.perPart; renderSheet(); return; }
+  if(a==="do-create"){
+    const title = (document.getElementById("fTitle").value||"").trim();
+    if(!title){ toast("先给活动起个名字"); return; }
+    const d = ui.draft, g = group();
+    const act = {
+      id: uid("a"), groupId: g.id,
+      title, emoji: d.emoji, color: PALETTE[state.activities.length % PALETTE.length],
+      date: d.date, start: d.start, end: d.end,
+      place: (document.getElementById("fPlace").value||"").trim(),
+      note: (document.getElementById("fNote").value||"").trim(),
+      hostId: state.meId, perPart: !!d.perPart,
+      joined: {}, createdAt: Date.now()
+    };
+    state.activities.push(act);
+    save();
+    ui.draft = null;
+    closeSheet();
+    render();
+    toast("活动已发起");
+    setTimeout(()=>openSheet("detail", act.id), 240);
+    return;
+  }
+
+  if(a==="copy-invite"){
+    const act = actById(el.dataset.id);
+    if(!act) return;
+    const t = inviteText(act);
+    copyText(t).then(ok=>{ if(ok) toast("邀请文案已复制，去群里粘贴"); else showCopyBox(t); });
+    return;
+  }
+  if(a==="nudge"){
+    const act = actById(el.dataset.id);
+    if(!act) return;
+    const t = nudgeText(act);
+    copyText(t).then(ok=>{ if(ok) toast("催办文案已复制，去群里粘贴"); else showCopyBox(t); });
+    return;
+  }
+
+  if(a==="reset"){
+    if(confirm("重置演示？所有数据会清空。")){
+      localStorage.removeItem(STORAGE_KEY);
+      state = defaultState(); ui.onbStep="welcome"; ui.onbDraft=null;
+      closeSheet(); render(); toast("已重置");
+    }
     return;
   }
 });
 
-/* ---------------- 时间块点选 ---------------- */
-document.addEventListener("click", (e)=>{
-  const slot = e.target.closest(".slot.free");
-  if(!slot) return;
-  const day = slot.dataset.day;
-  const idx = parseInt(slot.dataset.index,10);
+/* --- 按住拖动选时间段 --- */
+let dragCtx = null;
 
-  if(!sel || sel.day !== day){
-    sel = { day, start:idx, end:idx };
-  }else{
-    if(idx === sel.start - 1) sel.start = idx;
-    else if(idx === sel.end + 1) sel.end = idx;
-    else if(idx >= sel.start && idx <= sel.end){
-      if(sel.start === sel.end) sel = null;
-      else if(idx === sel.start) sel.start++;
-      else if(idx === sel.end) sel.end--;
-    }else{
-      sel = { day, start:idx, end:idx };
-    }
-  }
-  renderDays();
-  renderSelectBar();
-});
-
-/* ---------------- 初始化 ---------------- */
-function renderAll(){
-  renderHeader();
-  renderHint();
-  renderDays();
-  renderSelectBar();
+function minuteFromY(clientY, colEl, rMin, rMax){
+  const r = colEl.getBoundingClientRect();
+  const ratio = (clientY - r.top) / Math.max(1, r.height);
+  let m = rMin + ratio * (rMax - rMin);
+  m = Math.round(m / SNAP) * SNAP;
+  return Math.max(rMin, Math.min(rMax, m));
 }
 
-renderAll();
+/* 拖动时只更新遮罩，避免重建整个日历导致坐标失效 */
+function paintSelection(){
+  if(!ui.sel) return;
+  const col = document.querySelector('.daycol[data-date="'+ui.sel.date+'"]');
+  if(!col) return;
+  let mask = col.querySelector('.selmask');
+  let tag = col.querySelector('.seltag');
+  if(!mask){
+    mask = document.createElement("div"); mask.className = "selmask";
+    tag = document.createElement("div"); tag.className = "seltag";
+    col.appendChild(mask); col.appendChild(tag);
+  }
+  const [rMin, rMax] = dayRange();
+  const total = rMax - rMin;
+  const s = Math.min(ui.sel.a, ui.sel.b), e = Math.max(ui.sel.a, ui.sel.b);
+  const top = (s-rMin)/total*100;
+  const hh = Math.max((e-s)/total*100, 0.7);
+  mask.style.top = top+"%";
+  mask.style.height = hh+"%";
+  tag.style.top = (top + hh/2)+"%";
+  tag.textContent = fmtTime(s)+"–"+fmtTime(e);
+}
+
+document.addEventListener("pointerdown", (e)=>{
+  const col = e.target.closest(".daycol");
+  if(!col) return;
+  if(e.target.closest(".card")) return;
+  if(e.button !== undefined && e.button !== 0) return;
+
+  const [rMin, rMax] = dayRange();
+  const m = minuteFromY(e.clientY, col, rMin, rMax);
+  dragCtx = { col, date: col.dataset.date, a:m, b:m, moved:false, rMin, rMax };
+  ui.sel = { date: col.dataset.date, a:m, b:m };
+  paintSelection();
+  renderBar();
+});
+
+document.addEventListener("pointermove", (e)=>{
+  if(!dragCtx) return;
+  const m = minuteFromY(e.clientY, dragCtx.col, dragCtx.rMin, dragCtx.rMax);
+  if(m !== dragCtx.b) dragCtx.moved = true;
+  dragCtx.b = m;
+  ui.sel = { date: dragCtx.date, a: dragCtx.a, b:m };
+  paintSelection();
+  renderBar();
+});
+
+document.addEventListener("pointerup", ()=>{
+  if(!dragCtx) return;
+  const ctx = dragCtx;
+  dragCtx = null;
+  if(!ctx.moved) return;
+  const a = Math.min(ui.sel.a, ui.sel.b), b = Math.max(ui.sel.a, ui.sel.b);
+  if(b - a < SNAP) ui.sel = { date: ctx.date, a:ctx.a, b:Math.min(DAY_MAX, ctx.a + SNAP) };
+  render();
+});
+
+/* --- 桌面 Ctrl+滚轮缩放 --- */
+document.addEventListener("wheel", (e)=>{
+  if(!e.ctrlKey) return;
+  if(!e.target.closest(".cal")) return;
+  e.preventDefault();
+  ui.zoom = Math.min(2, Math.max(0.7, Math.round((ui.zoom + (e.deltaY>0?-0.1:0.1))*100)/100));
+  render();
+}, { passive:false });
+
+/* --- 双指缩放 --- */
+let pinchStart = null;
+document.addEventListener("touchstart", (e)=>{
+  if(e.touches.length === 2 && e.target.closest(".cal")){
+    const d = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
+    pinchStart = { d, zoom: ui.zoom, applied: ui.zoom };
+  }
+}, { passive:true });
+document.addEventListener("touchmove", (e)=>{
+  if(!pinchStart || e.touches.length !== 2) return;
+  const d = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
+  const ratio = d / Math.max(1, pinchStart.d);
+  const nz = Math.min(2, Math.max(0.7, pinchStart.zoom * ratio));
+  const rounded = Math.round(nz*10)/10;
+  if(Math.abs(rounded - pinchStart.applied) >= 0.1){
+    pinchStart.applied = rounded;
+    ui.zoom = rounded;
+    e.preventDefault();
+    render();
+  }
+}, { passive:false });
+document.addEventListener("touchend", ()=>{ pinchStart = null; }, { passive:true });
+
+/* --- 文案 --- */
+async function copyText(text){
+  try{ await navigator.clipboard.writeText(text); return true; }catch(e){}
+  try{
+    const ta = document.createElement("textarea");
+    ta.value = text; ta.style.position="fixed"; ta.style.top="-1000px";
+    document.body.appendChild(ta); ta.select();
+    const ok = document.execCommand("copy");
+    document.body.removeChild(ta);
+    return ok;
+  }catch(e){ return false; }
+}
+function inviteText(a){
+  const d = parseYmd(a.date);
+  const lines = [];
+  lines.push(a.emoji+" "+WEEK_CN[d.getDay()]+" "+fmtMD(d)+" "+fmtTime(a.start)+"–"+fmtTime(a.end)+" · "+a.title);
+  if(a.place) lines.push("📍 "+a.place);
+  if(a.note) lines.push(a.note);
+  const n = Object.keys(a.joined||{}).length;
+  lines.push(n ? ("已经 "+n+" 人报名，来不来？") : "来不来？");
+  return lines.join("\n");
+}
+function nudgeText(a){
+  const silent = members().filter(m=>m.id!==state.meId && (!a.joined || !a.joined[m.id]));
+  const d = parseYmd(a.date);
+  return "还差你们 "+silent.length+" 个："+silent.map(m=>m.name).join("、")+"\n"+
+    WEEK_CN[d.getDay()]+" "+fmtMD(d)+" "+fmtTime(a.start)+"–"+fmtTime(a.end)+" · "+a.title+"\n来不来？点开选一下。";
+}
+function showCopyBox(text){
+  const div = document.createElement("div");
+  div.className = "copy-overlay";
+  div.innerHTML = '<div class="copy-box"><div class="copy-title">长按全选，复制这段文案</div>'+
+    '<textarea readonly></textarea><button class="primary" data-copy-close>好了</button></div>';
+  div.querySelector("textarea").value = text;
+  document.body.appendChild(div);
+  const ta = div.querySelector("textarea");
+  setTimeout(()=>{ ta.focus(); ta.select(); }, 40);
+  div.addEventListener("click",(e)=>{
+    if(e.target===div || e.target.hasAttribute("data-copy-close")) div.remove();
+  });
+}
+function toast(msg){
+  const el = document.getElementById("toast");
+  el.textContent = msg; el.classList.add("on");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(()=>el.classList.remove("on"), 1700);
+}
+
+/* ---------------- 群组创建 ---------------- */
+function createGroup(name, emoji, meName, friendNames){
+  const arr = [];
+  const meId = uid("m");
+  arr.push({ id:meId, name:meName, color:PALETTE[0] });
+  friendNames.filter(f=>f && f.trim()).forEach((f,i)=>{
+    arr.push({ id:uid("m"), name:f.trim(), color:PALETTE[(i+1)%PALETTE.length] });
+  });
+  const g = { id:uid("g"), name, emoji, members:arr, createdAt:Date.now() };
+  state.groups.push(g);
+  state.activeGroupId = g.id;
+  state.meId = meId;
+  state.onboarded = true;
+  seedExamples(g);
+  save();
+  ui.onbStep = "welcome"; ui.onbDraft = null;
+  render();
+  toast("群组创建好了");
+}
+
+function createDemoGroup(){
+  const g = {
+    id: uid("g"), name:"周末常玩组", emoji:"🏕️", createdAt: Date.now(),
+    members: [
+      { id:"m1", name:"小明", color:PALETTE[2] },
+      { id:"m2", name:"老王", color:PALETTE[0] },
+      { id:"m3", name:"阿花", color:PALETTE[1] },
+      { id:"m4", name:"Momo", color:PALETTE[3] },
+      { id:"m5", name:"大头", color:PALETTE[4] },
+      { id:"m6", name:"小鹿", color:PALETTE[5] }
+    ]
+  };
+  state.groups.push(g);
+  state.activeGroupId = g.id;
+  state.meId = "m1";
+  state.onboarded = true;
+  seedExamples(g);
+  save();
+  render();
+  toast("已加入示例群组");
+}
+
+/* ---------------- 示例数据 ---------------- */
+function seedExamples(g){
+  const w = weekendDates();
+  const wd = weekdayDates();
+  const pick = i => (g.members[i] ? g.members[i].id : g.members[0].id);
+  const meId = state.meId;
+
+  const acts = [
+    {
+      id: uid("a"), groupId: g.id, title:"老王火锅局", emoji:"🍲", color:PALETTE[0],
+      date: ymd(w[0]), start: 11*60+30, end: 19*60+30,
+      place:"蜀大侠 · 国贸店", note:"下午涮完去旁边桌游店坐坐，晚饭回来接着吃。",
+      hostId: pick(1), perPart:true,
+      joined: {
+        [pick(1)]: { lunch:"in", pm:"in", dinner:"in" },
+        [pick(2)]: { lunch:"in", pm:"maybe", dinner:"in" },
+        [pick(3)]: { lunch:"in", pm:"in", dinner:"maybe" }
+      }
+    },
+    {
+      id: uid("a"), groupId: g.id, title:"桌游夜", emoji:"🎲", color:PALETTE[2],
+      date: ymd(w[0]), start: 19*60+30, end: 23*60,
+      place:"我家客厅", note:"狼人杀 + 德州，夜宵点烧烤。",
+      hostId: meId, perPart:true,
+      joined: {
+        [meId]:  { eve:"in", late:"maybe" },
+        [pick(1)]:{ eve:"in", late:"in" },
+        [pick(2)]:{ eve:"in" }
+      }
+    },
+    {
+      id: uid("a"), groupId: g.id, title:"香山看红叶", emoji:"🍁", color:PALETTE[3],
+      date: ymd(w[1]), start: 8*60+30, end: 13*60,
+      place:"香山公园东门", note:"八点半东门集合，带瓶水，人多吃个早午饭再回。",
+      hostId: pick(3), perPart:true,
+      joined: {
+        [pick(3)]: { am:"in", lunch:"in" },
+        [pick(5)]: { am:"in", lunch:"maybe" }
+      }
+    },
+    {
+      id: uid("a"), groupId: g.id, title:"周三羽毛球", emoji:"🏸", color:PALETTE[4],
+      date: ymd(wd[2]), start: 19*60, end: 21*60+30,
+      place:"朝阳体育馆", note:"订了两块场地，缺人。",
+      hostId: pick(2), perPart:false,
+      joined: { [pick(2)]: { "*":"in" }, [pick(1)]: { "*":"in" } }
+    },
+    {
+      id: uid("a"), groupId: g.id, title:"小酒馆", emoji:"🍻", color:PALETTE[1],
+      date: ymd(wd[3]), start: 20*60, end: 23*60,
+      place:"三里屯", note:"新开的那家，听说有桶陈。",
+      hostId: pick(1), perPart:false,
+      joined: { [pick(1)]: { "*":"in" } }
+    }
+  ];
+  state.activities.push(...acts);
+}
+
+/* ---------------- 启动 ---------------- */
+render();
 </script>
 </body>
 </html>
