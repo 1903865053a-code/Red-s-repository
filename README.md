@@ -1,5 +1,8 @@
 # 周末活动小助手 · Demo
 
+**在线地址：** https://1903865053a-code.github.io/Red-s-repository/
+（GitHub Pages 在境外，国内访问有时会慢或打不开）
+
 ## 怎么打开
 
 双击 `index.html`，用 Chrome 或 Edge 打开。
