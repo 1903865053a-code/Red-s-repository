@@ -12,7 +12,14 @@
   var QS = new URLSearchParams(window.location.search);
   var THEME_ID = QS.get('theme') || SITE.theme;
   var T = THEMES[THEME_ID] || THEMES[SITE.theme] || THEMES.halloween;
-  var COPY = T.copy;
+  var COPY = Object.assign({}, T.copy);
+
+  // 你们俩的真实内容（STORY）优先于主题自带的通用文案
+  if (typeof STORY !== 'undefined' && STORY) {
+    if (STORY.places && STORY.places.length) COPY.lanternLines = STORY.places;
+    if (STORY.letter && STORY.letter.length) COPY.letter = STORY.letter;
+  }
+  var TOTAL = COPY.lanternLines.length;
   var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   var $ = function (id) { return document.getElementById(id); };
@@ -364,7 +371,7 @@
     Sound.plink(i);
 
     lit += 1;
-    lanternCounter.textContent = fmt(COPY.lanternHintFmt, { n: lit });
+    lanternCounter.textContent = fmt(COPY.lanternHintFmt, { n: lit, total: TOTAL });
 
     if (lit >= COPY.lanternLines.length) {
       setTimeout(function () {
@@ -550,8 +557,8 @@
 
     for (var i = 0; i < nodes.length; i++) {
       nodes[i].style.opacity = '';
-      await typeInto(nodes[i], paras[i], 32);
-      await wait(140);
+      await typeInto(nodes[i], paras[i], 18);
+      await wait(90);
     }
 
     letterSign.hidden = false;
@@ -591,7 +598,7 @@
     heroLantern.classList.remove('is-lit');
     lanternRow.querySelectorAll('.lantern').forEach(function (b) { b.classList.remove('is-lit'); });
     lanternLine.textContent = COPY.lanternIntro || '';
-    lanternCounter.textContent = fmt(COPY.lanternHintFmt, { n: 0 });
+    lanternCounter.textContent = fmt(COPY.lanternHintFmt, { n: 0, total: TOTAL });
 
     houseBtn.classList.remove('is-open');
     doorLine.textContent = COPY.doorLine;
@@ -643,7 +650,7 @@
     $('coverSub').textContent = tpl(COPY.coverSub);
     $('startLabel').textContent = COPY.start;
 
-    lanternCounter.textContent = fmt(COPY.lanternHintFmt, { n: 0 });
+    lanternCounter.textContent = fmt(COPY.lanternHintFmt, { n: 0, total: TOTAL });
     lanternLine.textContent = COPY.lanternIntro || '';
 
     doorLine.textContent = COPY.doorLine;
