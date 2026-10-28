@@ -9,24 +9,20 @@
 
 <title>不给糖就捣蛋</title>
 <meta name="description" content="一张给你的小卡片">
-<meta property="og:title" content="不给糖就捣蛋">
-<meta property="og:description" content="一张给你的小卡片">
 
-<link rel="stylesheet" href="style.css?v=2">
+<link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
 
-<div class="stage">
+<canvas class="sparks" id="sparks" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
+<div class="progress" id="progress" aria-hidden="true"></div>
+<div class="year-chip" id="yearChip" aria-hidden="true"></div>
 
-  <main class="card" id="card" aria-live="polite">
+<div class="page">
 
-    <!-- 飘动的光点 / 雪 / 心 -->
-    <canvas class="sparks" id="sparks" aria-hidden="true"></canvas>
-
-    <!-- 纸的纹理 -->
-    <div class="grain" aria-hidden="true"></div>
-
-    <!-- 夜景里一直都在的月亮和蝙蝠 -->
+  <!-- ============ 封面 ============ -->
+  <header class="hero" id="top">
     <div class="moon" aria-hidden="true"></div>
     <div class="bats" aria-hidden="true">
       <span class="bat bat--1"></span>
@@ -34,32 +30,21 @@
       <span class="bat bat--3"></span>
     </div>
 
-    <!-- ============ 幕 1 · 封面 ============ -->
-    <section class="scene scene--cover is-active" data-scene="cover">
-      <p class="kicker" id="coverKicker"></p>
+    <p class="kicker" id="coverKicker"></p>
+    <h1 class="sticker hero-title" id="coverTitle"></h1>
+    <p class="hero-sub" id="coverSub"></p>
 
-      <h1 class="sticker title" id="coverTitle"></h1>
+    <button class="btn-start" id="startBtn" type="button"></button>
+  </header>
 
-      <p class="sub" id="coverSub"></p>
+  <!-- ============ 一年一章，由 JS 生成 ============ -->
+  <main id="story"></main>
 
-      <button class="lantern-btn" id="startBtn" type="button">
-        <span class="lantern lantern--hero" data-glyph></span>
-        <span class="tap-hint" id="startLabel">点我</span>
-      </button>
-    </section>
+  <!-- ============ 收尾：门 → 给糖/捣蛋 → 信 ============ -->
+  <section class="finale" id="finale">
 
-    <!-- ============ 幕 2 · 五盏灯 ============ -->
-    <section class="scene scene--lanterns" data-scene="lanterns">
-      <p class="line line--lantern" id="lanternLine">　</p>
-
-      <div class="lantern-row" id="lanternRow"></div>
-
-      <p class="counter" id="lanternCounter"></p>
-    </section>
-
-    <!-- ============ 幕 3 · 那扇门 ============ -->
-    <section class="scene scene--door" data-scene="door">
-      <p class="line" id="doorLine"></p>
+    <div class="finale-block" id="finaleDoor">
+      <p class="hint" id="finaleHint"></p>
 
       <button class="house" id="houseBtn" type="button" aria-label="敲门">
         <span class="roof" aria-hidden="true"></span>
@@ -73,25 +58,23 @@
         </span>
       </button>
 
-      <p class="hint" id="doorHint"></p>
-    </section>
+      <p class="hint hint--knock" id="knockHint"></p>
+    </div>
 
-    <!-- ============ 幕 4 · 给糖 / 捣蛋 ============ -->
-    <section class="scene scene--choice" data-scene="choice">
-      <h2 class="sticker title title--sm" id="choiceTitle"></h2>
-      <p class="sub sub--tight" id="choiceSub"></p>
+    <div class="finale-block" id="finaleChoice" hidden>
+      <h2 class="sticker title" id="choiceTitle"></h2>
+      <p class="sub" id="choiceSub"></p>
 
       <div class="choice-row">
         <button class="btn btn--accent" id="treatBtn" type="button"></button>
         <button class="btn btn--ghost" id="trickBtn" type="button"></button>
       </div>
 
-      <p class="line line--choice" id="choiceLine">　</p>
-    </section>
+      <p class="line" id="choiceLine"></p>
+    </div>
 
-    <!-- ============ 幕 5 · 信 ============ -->
-    <section class="scene scene--letter" data-scene="letter">
-      <p class="hint hint--letter" id="letterHint"></p>
+    <div class="finale-block" id="finaleLetter" hidden>
+      <p class="hint" id="envelopeHint"></p>
 
       <button class="envelope" id="envelopeBtn" type="button">
         <span class="env-back" aria-hidden="true"></span>
@@ -112,23 +95,28 @@
       </article>
 
       <button class="replay" id="replayBtn" type="button" hidden></button>
-    </section>
+    </div>
 
-    <!-- 效果层：撒糖 / 起雾 -->
-    <div class="fx" id="fx" aria-hidden="true"></div>
+  </section>
 
-    <button class="sound" id="soundBtn" type="button" aria-label="声音开关">🔊</button>
+  <footer class="foot" aria-hidden="true"></footer>
 
-  </main>
-
-  <p class="foot" aria-hidden="true"></p>
 </div>
 
+<nav class="year-rail" id="yearRail" hidden aria-label="年份"></nav>
+
+<div class="lightbox" id="lightbox" hidden>
+  <img id="lbImg" alt="">
+  <p class="lb-cap" id="lbCap"></p>
+</div>
+
+<button class="sound" id="soundBtn" type="button" aria-label="声音开关">🔊</button>
+
 <noscript>
-  <p style="text-align:center;color:#2B1A3E;font:16px/1.6 sans-serif">这个页面需要打开 JavaScript 才能看。</p>
+  <p style="text-align:center;color:#FFF4E6;font:16px/1.6 sans-serif;padding:40px 20px">这个页面需要打开 JavaScript 才能看。</p>
 </noscript>
 
-<script src="config.js?v=2"></script>
-<script src="app.js?v=2"></script>
+<script src="config.js?v=3"></script>
+<script src="app.js?v=3"></script>
 </body>
 </html>

@@ -3,52 +3,155 @@
    -------------------------------------------------------------
    你只需要改这一个文件，改完保存、刷新网页就能看到。
 
-   ① 改称呼 / 落款        → 下面 SITE 里的 herName / signature
-   ② 换节日（以后不过万圣节了）→ 把 SITE.theme 改成 'christmas' 或 'valentine'
-   ③ 改文案               → 下面 THEMES 里对应主题的 copy
-   ④ 加一句「在一起第几天」 → 把 startDate 填成 2024-10-31 这样
+   ① 改称呼 / 落款 / 起始日   → SITE
+   ② 改封面文字、每一年的照片和句子 → STORY
+   ③ 换节日配色              → SITE.theme 或网址加 ?theme=christmas
    ============================================================= */
 
 const SITE = {
-  /* ★ 她的称呼：会出现在封面、信里和结尾 */
+  /* ★ 她的称呼 */
   herName: '哈基米',
 
   /* ★ 信的落款 */
   signature: '爱你的',
 
-  /* ★ 可选：落款后面接的名字。留空就只有「爱你的」 */
+  /* ★ 落款后面接的名字。留空就只有「爱你的」 */
   fromName: 'Red',
 
-  /* ★ 可选：在一起的第一天，写成 2025-10-31 这样。
-        填了会在信的末尾多一行「今天是在一起的第 N 天」。
-        不想显示就留空 '' */
+  /* ★ 在一起的第一天。信的末尾会按今天现算「第 N 天」 */
   startDate: '2019-01-26',
 
-  /* ★ 主题：'halloween'（万圣节）| 'christmas'（圣诞）| 'valentine'（情人节） */
+  /* ★ 主题：'halloween' | 'christmas' | 'valentine' */
   theme: 'halloween',
 
-  /* ★ 一开始是否有声音（右上角随时可以关） */
+  /* ★ 一开始有没有声音（右上角随时能关） */
   sound: true,
 };
 
 /* =============================================================
-   ★ 你们俩的真实内容 —— 跟节日无关，换主题也不会丢
+   ★ 故事 —— 按年份往下排
    -------------------------------------------------------------
-   这两块会盖掉主题里自带的通用文案。
-   一行就是一条/一段，想删就整行删掉，想加就加一行。
+   加一年 = 复制一段 { year, line, moments } 粘在后面。
+   每一年的照片放在 photos/年份/ 里，src 写相对路径就行。
+   一个 moment 可以放 1～4 张照片，手机上可以左右滑。
    ============================================================= */
 
 const STORY = {
-  /* 五盏灯：一盏一个地方。改成你们自己的顺序，数量也可以变（3 盏、6 盏都行） */
-  places: [
-    '第一盏，广州。高中毕业那年，第一次一起出门，之前一直没机会。',
-    '第二盏，江门、汕头、淡水。省内跑的几趟，挤在一盏里。',
-    '第三盏，新丰。去得最多的那个地方。',
-    '第四盏，河南。第一次出省。',
-    '第五盏，格鲁吉亚、土耳其。第一次出国。',
+  /* 封面 */
+  cover: {
+    kicker: '十月三十一日 · 夜',
+    title: '不给糖就捣蛋',
+    sub: '这些年的照片，我一张一张洗出来。\n慢慢往下翻。',
+    cta: '开始往下走',
+  },
+
+  years: [
+    {
+      year: '2019',
+      line: '高中，毕业，第一次一起出门。',
+      moments: [
+        {
+          date: '05.01',
+          text: '假期，跑去找她。',
+          note: '',
+          photos: [{ src: 'photos/2019/0501-find-her.jpg', alt: '她靠在我肩上' }],
+        },
+        {
+          date: '05.10',
+          text: '放学，在地铁站一人一瓶啤酒。',
+          note: 'Corona，碰了一下。',
+          photos: [{ src: 'photos/2019/0510-beer.jpg', alt: '两瓶 Corona 碰杯' }],
+        },
+        {
+          date: '05.14',
+          text: '她生日。',
+          note: '拍了一堆拍立得，拼成一个心。',
+          photos: [{ src: 'photos/2019/0514-birthday.jpg', alt: '拍立得拼成的心' }],
+        },
+        {
+          date: '05.30',
+          text: '晚上，看城里的灯。',
+          note: '说希望有个家，成为其中一盏灯火。',
+          photos: [{ src: 'photos/2019/0530-night.jpg', alt: '夜里失焦的城市灯火' }],
+        },
+        {
+          date: '06.13',
+          text: '高中毕业，第一次一起出门——广州。',
+          note: '第一支玫瑰也是那天送的。',
+          photos: [
+            { src: 'photos/2019/0613-gz-shop.jpg', alt: '服装店镜子前的合照' },
+            { src: 'photos/2019/0613-gz-river.jpg', alt: '她趴在江边栏杆上看对岸' },
+            { src: 'photos/2019/0613-rose.jpg', alt: '一支粉玫瑰' },
+          ],
+        },
+        {
+          date: '06.18',
+          text: '又去了江边。',
+          note: '',
+          photos: [{ src: 'photos/2019/0618-river-heart.jpg', alt: '双手比心，背后是江和城市' }],
+        },
+        {
+          date: '07.29',
+          text: '欢乐谷。',
+          note: '坐了旋转木马。',
+          photos: [{ src: 'photos/2019/0729-park.jpg', alt: '她在旋转木马上' }],
+        },
+        {
+          date: '08.05',
+          text: '一个下午：咖啡、龙虾、一双很小的 AJ。',
+          note: '% Arabica 那天在下雨。',
+          photos: [
+            { src: 'photos/2019/0805-arabica.jpg', alt: '手里的 % Arabica' },
+            { src: 'photos/2019/0805-cafe.jpg', alt: '圆形吧台的咖啡店' },
+            { src: 'photos/2019/0805-lobster.jpg', alt: '蒜蓉粉丝龙虾' },
+            { src: 'photos/2019/0805-aj.jpg', alt: '盒子里很小的 Air Jordan' },
+          ],
+        },
+        {
+          date: '08.07',
+          text: '一起做手账。',
+          note: '本子是牛皮纸的。',
+          photos: [{ src: 'photos/2019/0807-journal.jpg', alt: '牛皮纸手账本' }],
+        },
+        {
+          date: '08.28',
+          text: '在三水买了这盏灯。',
+          note: '现在还亮着。',
+          photos: [{ src: 'photos/2019/0828-lamp.jpg', alt: '亮着的落地灯' }],
+        },
+        {
+          date: '09.12',
+          text: '大学天台上。',
+          note: '影子落在瓷砖上。',
+          photos: [{ src: 'photos/2019/0912-roof.jpg', alt: '瓷砖墙上的两个人影' }],
+        },
+        {
+          date: '12.08',
+          text: '三水的摩天轮。',
+          note: '黄昏上的。',
+          photos: [{ src: 'photos/2019/1208-wheel.jpg', alt: '黄昏里的她' }],
+        },
+      ],
+    },
   ],
 
-  /* 那封信。一行一段 */
+  /* 最后收尾的三个动作 */
+  finale: {
+    hint: '还有最后一件事。',
+    doorLine: '门后面好像有东西。',
+    knockHint: '敲三下',
+    knocks: ['咚……', '咚、咚……', '门开了。'],
+    doorOpen: '里面是我。',
+    choiceTitle: '不给糖，就捣蛋',
+    choiceSub: '选一个。',
+    treat: '给糖',
+    trick: '捣蛋',
+    treatLine: '给。糖都给你。',
+    trickLine: '……算了，糖还是给你。',
+    envelopeHint: '打开信',
+  },
+
+  /* ★ 那封信 —— 一行一段。你说要自己重写，这段先占着位 */
   letter: [
     '高中那几年，我们先是同学，后来是不太说话的同学。',
     '再聊起来是在运动会上。后面就快了。',
@@ -56,20 +159,21 @@ const STORY = {
     '我们的 wifi 叫猫狗之家。家里还没有猫，也没有狗。',
     '先这样吧。我们互为对方的猫狗。',
   ],
+
+  daysFmt: '今天是在一起的第 {n} 天。',
+  bye: '万圣节快乐，{name}。',
+  replay: '从头再看一遍',
 };
 
 /* =============================================================
-   下面是三套主题。原理：颜色、粒子、点亮的物件、全部文案
-   都放在一起，换主题 = 换一组数据，不用动代码。
+   主题：只放颜色和飘落的效果，不含任何文字
    ============================================================= */
 
 const THEMES = {
-  /* ---------------- 万圣节 ---------------- */
   halloween: {
     name: '万圣节',
     glyph: 'pumpkin',
     particles: 'embers',
-
     palette: {
       'ink': '#2B1A3E',
       'night-1': '#43285F',
@@ -84,59 +188,12 @@ const THEMES = {
       'desk-1': '#F1E8F8',
       'desk-2': '#D8C9E8',
     },
-
-    copy: {
-      toLabel: 'TO',
-      coverKicker: '十月三十一日 · 夜',
-      coverTitle: '不给糖就捣蛋',
-      coverSub: '今天是万圣节。\n我在路上藏了五盏灯——一盏一个地方。',
-      start: '点亮第一盏',
-
-      lanternHint: '点亮 0 / 5',
-      lanternHintFmt: '点亮 {n} / {total}',
-      lanternIntro: '一盏一盏，点亮它们。',
-      lanternLines: [
-        '第一盏，给你照路。',
-        '第二盏，给你暖手。',
-        '第三盏……你把糖藏哪了？',
-        '第四盏，替我抱你一下。',
-        '第五盏也亮了。前面有扇门。',
-      ],
-
-      doorLine: '门后面好像有东西。',
-      doorHint: '敲三下',
-      doorKnocks: ['咚……', '咚、咚……', '门开了。'],
-      doorOpenLine: '里面是我。',
-
-      choiceTitle: '不给糖，就捣蛋',
-      choiceSub: '选一个。',
-      treat: '给糖',
-      trick: '捣蛋',
-      treatLine: '给。糖都给你。',
-      trickLine: '……算了，糖还是给你。',
-
-      letterHint: '还有最后一件事。',
-      letterOpen: '打开',
-      letter: [
-        '万圣节的糖会吃完，南瓜灯也会熄。',
-        '但我想给你的这份，不会。',
-        '不只是今天。',
-        '以后每一年的这一天，我都想陪你过。',
-        '万圣节也好，别的什么日子也好。',
-      ],
-      daysFmt: '今天是在一起的第 {n} 天。',
-
-      bye: '万圣节快乐，{name}。',
-      replay: '再看一遍',
-    },
   },
 
-  /* ---------------- 圣诞 ---------------- */
   christmas: {
     name: '圣诞',
     glyph: 'candle',
     particles: 'snow',
-
     palette: {
       'ink': '#152A22',
       'night-1': '#18503C',
@@ -151,59 +208,12 @@ const THEMES = {
       'desk-1': '#F3EEE4',
       'desk-2': '#DCCFBB',
     },
-
-    copy: {
-      toLabel: 'TO',
-      coverKicker: '十二月二十五日 · 夜',
-      coverTitle: '圣诞快乐',
-      coverSub: '今晚我点了五盏小灯。\n一盏一句，慢慢看。',
-      start: '点亮第一盏',
-
-      lanternHint: '点亮 0 / 5',
-      lanternHintFmt: '点亮 {n} / {total}',
-      lanternIntro: '一盏一盏，点亮它们。',
-      lanternLines: [
-        '第一盏，给你照路。',
-        '第二盏，给你暖手。',
-        '第三盏……袜子挂好了吗？',
-        '第四盏，替我抱你一下。',
-        '第五盏也亮了。前面有扇门。',
-      ],
-
-      doorLine: '门后面好像有东西。',
-      doorHint: '敲三下',
-      doorKnocks: ['咚……', '咚、咚……', '门开了。'],
-      doorOpenLine: '里面是我。',
-
-      choiceTitle: '要礼物，还是捣蛋',
-      choiceSub: '选一个。',
-      treat: '要礼物',
-      trick: '捣蛋',
-      treatLine: '乖。礼物给你，人也给你。',
-      trickLine: '……算了，礼物还是给你。',
-
-      letterHint: '还有最后一件事。',
-      letterOpen: '打开',
-      letter: [
-        '雪会停，灯会灭，热闹也会散。',
-        '但我想给你的这份，不会。',
-        '不只是今天。',
-        '以后每一年的这一天，我都想陪你过。',
-        '圣诞节也好，别的什么日子也好。',
-      ],
-      daysFmt: '今天是在一起的第 {n} 天。',
-
-      bye: '圣诞快乐，{name}。',
-      replay: '再看一遍',
-    },
   },
 
-  /* ---------------- 情人节 ---------------- */
   valentine: {
     name: '情人节',
     glyph: 'heart',
     particles: 'hearts',
-
     palette: {
       'ink': '#3D1622',
       'night-1': '#6E2C46',
@@ -217,51 +227,6 @@ const THEMES = {
       'glow': '#FFD9E2',
       'desk-1': '#FBEFF2',
       'desk-2': '#EBD2DA',
-    },
-
-    copy: {
-      toLabel: 'TO',
-      coverKicker: '二月十四日 · 夜',
-      coverTitle: '今天想见你',
-      coverSub: '我点了五盏小灯。\n一盏一句，慢慢看。',
-      start: '点亮第一盏',
-
-      lanternHint: '点亮 0 / 5',
-      lanternHintFmt: '点亮 {n} / {total}',
-      lanternIntro: '一盏一盏，点亮它们。',
-      lanternLines: [
-        '第一盏，给你照路。',
-        '第二盏，给你暖手。',
-        '第三盏……你今天有点好看。',
-        '第四盏，替我抱你一下。',
-        '第五盏也亮了。前面有扇门。',
-      ],
-
-      doorLine: '门后面好像有东西。',
-      doorHint: '敲三下',
-      doorKnocks: ['咚……', '咚、咚……', '门开了。'],
-      doorOpenLine: '里面是我。',
-
-      choiceTitle: '要花，还是捣蛋',
-      choiceSub: '选一个。',
-      treat: '要花',
-      trick: '捣蛋',
-      treatLine: '乖。花给你，人也给你。',
-      trickLine: '……算了，花还是给你。',
-
-      letterHint: '还有最后一件事。',
-      letterOpen: '打开',
-      letter: [
-        '花会谢，灯会灭，热闹也会散。',
-        '但我想给你的这份，不会。',
-        '不只是今天。',
-        '以后每一年的这一天，我都想陪你过。',
-        '情人节也好，别的什么日子也好。',
-      ],
-      daysFmt: '今天是在一起的第 {n} 天。',
-
-      bye: '情人节快乐，{name}。',
-      replay: '再看一遍',
     },
   },
 };
