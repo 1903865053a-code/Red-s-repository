@@ -443,6 +443,7 @@ body.js-ready .photo:not(.is-developed) img{
   gap:12px;
   margin-top:18px;
 }
+.moment--notext .moment-text{ margin-top:0; }
 
 .moment-date{
   flex:none;

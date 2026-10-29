@@ -255,27 +255,32 @@
 
       y.moments.forEach(function (m, mi) {
         var art = el('article', 'moment');
+        var pics = m.photos || [];
 
-        var strip = el('div', 'photos' + (m.photos.length === 1 ? ' is-single' : ''));
+        if (pics.length) {
+          var strip = el('div', 'photos' + (pics.length === 1 ? ' is-single' : ''));
 
-        m.photos.forEach(function (p, pi) {
-          var fig = el('figure', 'photo');
-          var tilt = ((mi + pi) % 2 === 0 ? -1 : 1) * (0.9 + ((mi + pi) % 3) * 0.45);
-          fig.style.setProperty('--tilt', tilt.toFixed(2) + 'deg');
+          pics.forEach(function (p, pi) {
+            var fig = el('figure', 'photo');
+            var tilt = ((mi + pi) % 2 === 0 ? -1 : 1) * (0.9 + ((mi + pi) % 3) * 0.45);
+            fig.style.setProperty('--tilt', tilt.toFixed(2) + 'deg');
 
-          var img = document.createElement('img');
-          img.src = p.src;
-          img.alt = p.alt || '';
-          img.loading = 'lazy';
-          img.decoding = 'async';
-          fig.appendChild(img);
+            var img = document.createElement('img');
+            img.src = p.src;
+            img.alt = p.alt || '';
+            img.loading = 'lazy';
+            img.decoding = 'async';
+            fig.appendChild(img);
 
-          fig.addEventListener('click', function () { openLightbox(p); });
-          photos.push(fig);
-          strip.appendChild(fig);
-        });
+            fig.addEventListener('click', function () { openLightbox(p); });
+            photos.push(fig);
+            strip.appendChild(fig);
+          });
 
-        art.appendChild(strip);
+          art.appendChild(strip);
+        } else {
+          art.classList.add('moment--notext');
+        }
 
         var textRow = el('div', 'moment-text');
         textRow.appendChild(el('span', 'moment-date', m.date));
