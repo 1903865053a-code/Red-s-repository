@@ -273,6 +273,12 @@ const STORY = {
           photos: [{ src: 'photos/2022/0521-selfie.jpg', alt: '加了恶魔角的合照' }],
         },
         {
+          date: '08.12',
+          text: '蛋仔派对。',
+          note: '暑假上线，你想玩，就一起玩。第一次一起拿第一，截了图。',
+          photos: [{ src: 'photos/2022/0812-eggparty.jpg', alt: '蛋仔派对第一次拿第一的结算画面' }],
+        },
+        {
           date: '10.26',
           text: '又是自助。',
           note: '新西兰鳌虾，剥好一盘，旁边还有飞鱼籽。',
