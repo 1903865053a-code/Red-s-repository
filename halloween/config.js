@@ -286,6 +286,81 @@ const STORY = {
         },
       ],
     },
+    {
+      year: '2023',
+      line: '毕业，搬离住了两年的广州。',
+      moments: [
+        {
+          date: '02.16',
+          text: '顺德，火焰醉鹅。',
+          note: '没吃完，打包带走了。',
+          photos: [{ src: 'photos/2023/0216-goose.jpg', alt: '大铁锅里的醉鹅' }],
+        },
+        {
+          date: '02.17',
+          text: '第二天又去顺德，金榜牛奶店。',
+          note: '好喝，也好吃。',
+          photos: [{ src: 'photos/2023/0217-milk.jpg', alt: '金榜牛奶店的招牌' }],
+        },
+        {
+          date: '03.14',
+          text: '广州动物园。',
+          note: '门票很便宜，看了一排小熊猫吃饭。',
+          photos: [{ src: 'photos/2023/0314-panda.jpg', alt: '一排低头吃饭的小熊猫' }],
+        },
+        {
+          date: '04.14',
+          text: '第一次一起去越野。',
+          note: '我穿着重装徒步鞋就上山，一点经验都没有。到顶天已经黑了，原路回不去，抄近道下山，打车回家。',
+          photos: [{ src: 'photos/2023/0414-hike.jpg', alt: '凤凰山的石碑' }],
+        },
+        {
+          date: '04.26',
+          text: '为了拍毕业照，专门买了台小米。',
+          note: '拍了很多，你挺满意。也是从这台手机开始，我才愿意多拍——之前那些照片，现在看总觉得单薄。',
+          photos: [{ src: 'photos/2023/0426-grad.jpg', alt: '穿学士服抱着花的毕业照' }],
+        },
+        {
+          date: '05.10',
+          text: '常去的树里有店。',
+          note: '离毕业只剩一个月，很快就要离开住了两年的广州。',
+          photos: [{ src: 'photos/2023/0510-shuli.jpg', alt: '夜里在街边桌旁的你' }],
+        },
+        {
+          date: '06.30',
+          text: '搬走前一天，最后拍的一张。',
+          note: '',
+          photos: [{ src: 'photos/2023/0630-last.jpg', alt: '靠墙坐着的合照' }],
+        },
+        {
+          date: '07.27',
+          text: '家附近，云南菌子火锅。',
+          note: '吃完才发现，我肚子受不了这个。',
+          photos: [{ src: 'photos/2023/0727-mushroom.jpg', alt: '冒着热气的竹编锅盖' }],
+        },
+        {
+          date: '09.15',
+          text: '龙华天虹，缪式川菜。',
+          note: '第一次一起吃。那天还有周杰伦联名的奈雪。',
+          photos: [{ src: 'photos/2023/0915-chuan.jpg', alt: '你举着联名奶茶' }],
+        },
+        {
+          date: '09.28',
+          text: '家附近，韩国人开的韩国料理。',
+          note: '挺好吃。现在倒闭了。',
+          photos: [{ src: 'photos/2023/0928-korean.jpg', alt: '你举着一杯紫色的饮料' }],
+        },
+        {
+          date: '12.25',
+          text: '圣诞节，在深圳。',
+          note: '',
+          photos: [
+            { src: 'photos/2023/1225-xmas-a.jpg', alt: '夜里的合照' },
+            { src: 'photos/2023/1225-xmas-b.jpg', alt: '两杯奶茶和一个纸袋' },
+          ],
+        },
+      ],
+    },
   ],
 
   /* 最后收尾的三个动作 */
