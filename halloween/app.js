@@ -642,7 +642,58 @@
     window.scrollTo({ top: 0, behavior: REDUCED ? 'auto' : 'smooth' });
   }
 
-  /* ---------- 7. 声音开关 ---------- */
+  /* ---------- 7. 口令门 ---------- */
+
+  var gateEl = $('gate');
+
+  function setupGate() {
+    var pass = (SITE && SITE.passcode) ? String(SITE.passcode) : '';
+    if (!pass) { gateEl.hidden = true; return; }
+
+    var G = STORY.gate || {};
+    $('gateKicker').textContent = G.kicker || '';
+    $('gateTitle').textContent = G.title || '先对个暗号';
+    $('gateHint').textContent = G.hint || '';
+    $('gateInput').placeholder = G.placeholder || '口令';
+    $('gateBtn').textContent = G.button || '开门';
+
+    var KEY = 'card_unlocked_v1';
+
+    function remember() {
+      try { localStorage.setItem(KEY, pass); } catch (e) { /* 无痕模式就算了 */ }
+    }
+    function remembered() {
+      try { return localStorage.getItem(KEY) === pass; } catch (e) { return false; }
+    }
+    function openGate() {
+      gateEl.classList.add('is-off');
+      document.body.classList.remove('is-locked');
+      setTimeout(function () { gateEl.hidden = true; }, 700);
+      tick();
+    }
+
+    if (remembered()) { gateEl.hidden = true; return; }
+
+    document.body.classList.add('is-locked');
+
+    $('gateForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var v = ($('gateInput').value || '').trim();
+      if (v === pass) {
+        remember();
+        Sound.ensure();
+        Sound.plink(0);
+        openGate();
+      } else {
+        $('gateWrong').textContent = G.wrong || '不对。';
+        gateEl.classList.add('is-wrong');
+        setTimeout(function () { gateEl.classList.remove('is-wrong'); }, 460);
+        $('gateInput').select();
+      }
+    });
+  }
+
+  /* ---------- 8. 声音开关 ---------- */
 
   var soundBtn = $('soundBtn');
 
@@ -658,13 +709,14 @@
     syncSoundBtn();
   });
 
-  /* ---------- 8. 启动 ---------- */
+  /* ---------- 9. 启动 ---------- */
 
   function init() {
     buildCover();
     buildYears();
     buildRail();
     setupFinale();
+    setupGate();
     railLinks = Array.prototype.slice.call(document.querySelectorAll('.year-rail a'));
 
     document.body.classList.add('js-ready');

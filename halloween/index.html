@@ -10,7 +10,7 @@
 <title>不给糖就捣蛋</title>
 <meta name="description" content="一张给你的小卡片">
 
-<link rel="stylesheet" href="style.css?v=4">
+<link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
 
@@ -18,6 +18,22 @@
 <div class="grain" aria-hidden="true"></div>
 <div class="progress" id="progress" aria-hidden="true"></div>
 <div class="year-chip" id="yearChip" aria-hidden="true"></div>
+
+<!-- 口令门 -->
+<div class="gate" id="gate">
+  <div class="gate-inner">
+    <p class="gate-kicker" id="gateKicker"></p>
+    <h1 class="sticker gate-title" id="gateTitle"></h1>
+    <p class="gate-hint" id="gateHint"></p>
+
+    <form class="gate-form" id="gateForm" autocomplete="off">
+      <input class="gate-input" id="gateInput" type="password" aria-label="口令" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <button class="gate-btn" id="gateBtn" type="submit"></button>
+    </form>
+
+    <p class="gate-wrong" id="gateWrong" aria-live="polite"></p>
+  </div>
+</div>
 
 <div class="page">
 
@@ -116,7 +132,7 @@
   <p style="text-align:center;color:#FFF4E6;font:16px/1.6 sans-serif;padding:40px 20px">这个页面需要打开 JavaScript 才能看。</p>
 </noscript>
 
-<script src="config.js?v=4"></script>
-<script src="app.js?v=4"></script>
+<script src="config.js?v=5"></script>
+<script src="app.js?v=5"></script>
 </body>
 </html>

@@ -65,6 +65,86 @@ body::before{
 }
 
 /* -------------------------------------------------------------
+   口令门
+   ------------------------------------------------------------- */
+body.is-locked{ overflow:hidden; }
+
+.gate{
+  position:fixed; inset:0; z-index:200;
+  display:flex; align-items:center; justify-content:center;
+  padding:26px;
+  text-align:center;
+  background:var(--night-2);
+  background-image:
+    radial-gradient(130% 70% at 50% 0%, var(--night-1) 0%, var(--night-2) 46%, var(--night-3) 100%);
+  transition:opacity .65s ease, visibility .65s;
+}
+.gate[hidden]{ display:none; }
+.gate.is-off{ opacity:0; visibility:hidden; pointer-events:none; }
+
+.gate-inner{ width:100%; max-width:330px; }
+
+.gate-kicker{
+  margin:0 0 16px;
+  font:600 11.5px/1 var(--round);
+  letter-spacing:.26em;
+  color:var(--second);
+  opacity:.8;
+}
+.gate-title{
+  margin:0;
+  font-size:clamp(28px, 9vw, 38px);
+  transform:rotate(-2deg);
+  display:inline-block;
+}
+.gate-hint{
+  margin:20px 0 26px;
+  font-size:13.5px;
+  line-height:1.8;
+  color:var(--paper);
+  opacity:.6;
+}
+.gate-form{ display:flex; gap:10px; }
+
+.gate-input{
+  flex:1; min-width:0;
+  background:rgba(255,244,230,.07);
+  border:2px solid rgba(255,244,230,.16);
+  border-radius:12px;
+  padding:14px 16px;
+  color:var(--paper);
+  font:600 16px/1.2 var(--zh);
+  outline:none;
+  -webkit-appearance:none;
+  appearance:none;
+  transition:border-color .25s ease, background .25s ease;
+}
+.gate-input:focus{ border-color:var(--second); background:rgba(255,244,230,.1); }
+.gate-input::placeholder{ color:rgba(255,244,230,.35); }
+
+.gate-btn{
+  flex:none;
+  border:0; border-radius:12px;
+  padding:0 22px;
+  background:var(--accent);
+  color:#FFF8EF;
+  font:800 15px/1 var(--round);
+  letter-spacing:.05em;
+  cursor:pointer;
+  box-shadow:0 4px 0 var(--accent-deep);
+  transition:transform .15s var(--ease), box-shadow .15s var(--ease);
+}
+.gate-btn:active{ transform:translateY(3px); box-shadow:0 1px 0 var(--accent-deep); }
+
+.gate-wrong{
+  margin:16px 0 0;
+  min-height:1.4em;
+  font-size:13px;
+  color:var(--second);
+}
+.gate.is-wrong .gate-inner{ animation:shake .42s var(--ease); }
+
+/* -------------------------------------------------------------
    顶部：进度条 / 年份标 / 声音
    ------------------------------------------------------------- */
 .progress{
