@@ -409,6 +409,66 @@ const STORY = {
         },
       ],
     },
+    {
+      year: '2025',
+      line: '第一次去新丰。第一次上门。',
+      moments: [
+        {
+          date: '01.24',
+          text: '河源。',
+          note: '有点贵，体验一般。',
+          photos: [{ src: 'photos/2025/0124-heyuan.jpg', alt: '一勺精致的前菜' }],
+        },
+        {
+          date: '02.15',
+          text: '江门。',
+          note: '比河源好多了。还在这儿学会了骑自行车。',
+          photos: [{ src: 'photos/2025/0215-jiangmen.jpg', alt: '你在喜茶门口举着饮料' }],
+        },
+        {
+          date: '04.20',
+          text: '佛山逛奥莱。',
+          note: '给你买了件衣服。',
+          photos: [{ src: 'photos/2025/0420-outlet.jpg', alt: '装袋的 T 恤' }],
+        },
+        {
+          date: '08.09',
+          text: '第一次去新丰。',
+          note: '吃了鹅醋钵。',
+          photos: [{ src: 'photos/2025/0809-xinfeng.jpg', alt: '砂锅里的鹅醋钵' }],
+        },
+        {
+          date: '08.14',
+          text: '在家做黄鱼面。',
+          note: '非常好吃。',
+          photos: [{ src: 'photos/2025/0814-noodle.jpg', alt: '一碗黄鱼面' }],
+        },
+        {
+          date: '08.31',
+          text: '回广州玩。',
+          note: '吃了广御轩，你不太喜欢。也吃了节目里一直看到的「宋」。',
+          photos: [{ src: 'photos/2025/0831-song.jpg', alt: '餐厅海报前的自拍' }],
+        },
+        {
+          date: '09.20',
+          text: '专门跑去喝 David 的联名喜茶。',
+          note: '感觉一般般。',
+          photos: [{ src: 'photos/2025/0920-heytea.jpg', alt: '联名杯和一张卡片' }],
+        },
+        {
+          date: '10.09',
+          text: '从日本给你带了包。',
+          note: '还有呀哈哈，和动森。',
+          photos: [{ src: 'photos/2025/1009-japan.jpg', alt: '手里抱着帆布包和呀哈哈挂件' }],
+        },
+        {
+          date: '11.14',
+          text: '第一次上门，准备了一堆东西。',
+          note: '',
+          photos: [{ src: 'photos/2025/1114-gifts.jpg', alt: '一桌子礼盒和袋子' }],
+        },
+      ],
+    },
   ],
 
   /* 最后收尾的三个动作 */
