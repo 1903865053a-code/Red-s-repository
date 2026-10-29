@@ -372,12 +372,12 @@
   var progress = $('progress');
   var ticking = false;
 
-  function onScroll() {
+  // 不依赖 scroll 事件：有些环境（后台标签页、某些内置浏览器）不派发它，
+  // 那样照片就永远不显影。定时巡检 + 滚动触发，双保险。
+  function tick() {
     if (ticking) return;
     ticking = true;
 
-    // rAF 在后台标签页里会被暂停，加个 setTimeout 兜底，
-    // 保证滚动时该显影的东西一定显影。
     var done = false;
     function run() {
       if (done) return;
@@ -385,7 +385,7 @@
       ticking = false;
 
       var doc = document.documentElement;
-      var vh = window.innerHeight;
+      var vh = window.innerHeight || 800;
       var max = doc.scrollHeight - vh;
       var p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
       progress.style.width = (p * 100) + '%';
@@ -680,9 +680,11 @@
       if (first) first.scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' });
     });
 
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
-    onScroll();
+    window.addEventListener('scroll', tick, { passive: true });
+    document.addEventListener('scroll', tick, { passive: true, capture: true });
+    window.addEventListener('resize', tick);
+    setInterval(function () { if (!document.hidden) tick(); }, 500);
+    tick();
 
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && !lightbox.hidden) closeLightbox();

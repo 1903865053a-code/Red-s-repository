@@ -52,9 +52,9 @@ const STORY = {
       moments: [
         {
           date: '05.01',
-          text: '假期，跑去找她。',
+          text: '假期，跑去找你。',
           note: '',
-          photos: [{ src: 'photos/2019/0501-find-her.jpg', alt: '她靠在我肩上' }],
+          photos: [{ src: 'photos/2019/0501-find-her.jpg', alt: '你靠在我肩上' }],
         },
         {
           date: '05.10',
@@ -64,7 +64,7 @@ const STORY = {
         },
         {
           date: '05.14',
-          text: '她生日。',
+          text: '你生日。',
           note: '拍了一堆拍立得，拼成一个心。',
           photos: [{ src: 'photos/2019/0514-birthday.jpg', alt: '拍立得拼成的心' }],
         },
@@ -80,7 +80,7 @@ const STORY = {
           note: '第一支玫瑰也是那天送的。',
           photos: [
             { src: 'photos/2019/0613-gz-shop.jpg', alt: '服装店镜子前的合照' },
-            { src: 'photos/2019/0613-gz-river.jpg', alt: '她趴在江边栏杆上看对岸' },
+            { src: 'photos/2019/0613-gz-river.jpg', alt: '你趴在江边栏杆上看对岸' },
             { src: 'photos/2019/0613-rose.jpg', alt: '一支粉玫瑰' },
           ],
         },
@@ -94,7 +94,7 @@ const STORY = {
           date: '07.29',
           text: '欢乐谷。',
           note: '坐了旋转木马。',
-          photos: [{ src: 'photos/2019/0729-park.jpg', alt: '她在旋转木马上' }],
+          photos: [{ src: 'photos/2019/0729-park.jpg', alt: '你在旋转木马上' }],
         },
         {
           date: '08.05',
@@ -129,7 +129,49 @@ const STORY = {
           date: '12.08',
           text: '三水的摩天轮。',
           note: '黄昏上的。',
-          photos: [{ src: 'photos/2019/1208-wheel.jpg', alt: '黄昏里的她' }],
+          photos: [{ src: 'photos/2019/1208-wheel.jpg', alt: '黄昏里的你' }],
+        },
+      ],
+    },
+    {
+      year: '2020',
+      line: '大半年没见。见了也吵。十月之后，还是在一起。',
+      moments: [
+        {
+          date: '10.18',
+          text: '十月，课室。',
+          note: '你比了个耶，遮住一只眼。',
+          photos: [{ src: 'photos/2020/1018-classroom.jpg', alt: '课室里你比了个耶' }],
+        },
+        {
+          date: '11.05',
+          text: '深圳，买口红。',
+          note: '你把手背试成了一盘颜色。',
+          photos: [{ src: 'photos/2020/1105-lipstick.jpg', alt: '手背上的口红试色' }],
+        },
+        {
+          date: '11.07',
+          text: '你把它 P 进了卡通里。',
+          note: '让我设成朋友圈背景。',
+          photos: [{ src: 'photos/2020/1107-cartoon.jpg', alt: '套着卡通画框的照片' }],
+        },
+        {
+          date: '11.28',
+          text: '三水，北江大堤。',
+          note: '你举着一朵小花，背后是落日。',
+          photos: [{ src: 'photos/2020/1128-dike.jpg', alt: '大堤上你举着一朵小花' }],
+        },
+        {
+          date: '12.07',
+          text: '我生日。',
+          note: '学校天台，一人一根仙女棒。',
+          photos: [{ src: 'photos/2020/1207-birthday.jpg', alt: '天台上两个人的仙女棒' }],
+        },
+        {
+          date: '12.25',
+          text: '圣诞节，你把草莓做成了小人。',
+          note: '还给它们挨个起了名字。',
+          photos: [{ src: 'photos/2020/1225-strawberry.jpg', alt: '做了表情的草莓' }],
         },
       ],
     },
