@@ -190,6 +190,66 @@ const STORY = {
         },
       ],
     },
+    {
+      year: '2021',
+      line: '上半年在深圳，下半年搬到广州。',
+      moments: [
+        {
+          date: '01.27',
+          text: '冬天，在三水的店里试兔耳朵。',
+          note: '背后一排哆啦A梦。',
+          photos: [{ src: 'photos/2021/0127-shop.jpg', alt: '店里戴着兔耳朵的合照' }],
+        },
+        {
+          date: '06.23',
+          text: '封控那阵，临时住进学校的轰趴馆。',
+          note: '你在铺床垫。',
+          photos: [{ src: 'photos/2021/0623-mattress.jpg', alt: '地板上铺开的床垫' }],
+        },
+        {
+          date: '07.09',
+          text: '三水的竹筒饭。',
+          note: '',
+          photos: [{ src: 'photos/2021/0709-bamboo.jpg', alt: '一桌竹筒盛的菜' }],
+        },
+        {
+          date: '07.26',
+          text: '深圳，去滑冰。',
+          note: '',
+          photos: [{ src: 'photos/2021/0726-skates.jpg', alt: '两双冰鞋' }],
+        },
+        {
+          date: '09.11',
+          text: '宜家，买了一把手指玩偶。',
+          note: '回公寓摆在床上，一人戴一手。',
+          photos: [{ src: 'photos/2021/0911-puppets.jpg', alt: '手指上套满玩偶' }],
+        },
+        {
+          date: '09.19',
+          text: '吃完日料，在小区公园坐了一会儿。',
+          note: '你坐在健身器材上。',
+          photos: [{ src: 'photos/2021/0919-park.jpg', alt: '夜里坐在健身器材上' }],
+        },
+        {
+          date: '10.21',
+          text: '第一千天。',
+          note: '出去逛了逛，照片拍下来的时候已经过了零点。',
+          photos: [{ src: 'photos/2021/1021-thousand.jpg', alt: '夜里的半身合照' }],
+        },
+        {
+          date: '10.30',
+          text: '融创乐园，万圣节。',
+          note: '脸上画了妆，站在霓虹灯底下。',
+          photos: [{ src: 'photos/2021/1030-halloween.jpg', alt: '霓虹灯下化了妆的合照' }],
+        },
+        {
+          date: '11.14',
+          text: '江边，背后是广州塔。',
+          note: '',
+          photos: [{ src: 'photos/2021/1114-tower.jpg', alt: '江边自拍，背后是广州塔' }],
+        },
+      ],
+    },
   ],
 
   /* 最后收尾的三个动作 */
