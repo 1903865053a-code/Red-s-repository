@@ -26,6 +26,7 @@
 
 html{
   scroll-behavior:smooth;
+  overflow-x:hidden;
   -webkit-text-size-adjust:100%;
   text-size-adjust:100%;
 }
@@ -36,7 +37,6 @@ body{
   color:var(--paper);
   background:var(--night-2);
   -webkit-tap-highlight-color:transparent;
-  overflow-x:hidden;
 }
 
 /* 固定的背景（不用 background-attachment:fixed，iOS 上会坏） */
@@ -470,6 +470,118 @@ body.js-ready .photo:not(.is-developed) img{
   opacity:.58;
 }
 .moment-note:empty{ display:none; }
+
+/* -------------------------------------------------------------
+   地图
+   ------------------------------------------------------------- */
+.mapsec{
+  padding-top:clamp(70px, 14vw, 110px);
+  text-align:center;
+}
+.map-title{
+  margin:0;
+  font-size:clamp(21px, 6.2vw, 27px);
+  transform:rotate(-1.4deg);
+  display:inline-block;
+}
+.map-sub{
+  margin:16px 0 6px;
+  font-size:13px;
+  line-height:1.8;
+  color:var(--paper);
+  opacity:.55;
+}
+.map-wrap{ position:relative; margin-top:6px; }
+.map-svg{ display:block; width:100%; height:auto; overflow:visible; }
+
+.map-grid line{ stroke:rgba(255,244,230,.07); stroke-width:1; }
+
+.map-far line{ stroke:rgba(185,167,240,.45); stroke-width:1; stroke-dasharray:3 4; }
+.map-far path{ fill:rgba(185,167,240,.55); }
+.map-far text{ font:600 10.5px var(--zh); fill:var(--second); opacity:.8; }
+.map-far text.far-year{ opacity:.45; font-size:9.5px; }
+
+.map-compass path{ fill:rgba(255,244,230,.35); }
+.map-compass text{ font:700 9.5px var(--round); fill:rgba(255,244,230,.35); text-anchor:middle; }
+.map-scale line{ stroke:rgba(255,244,230,.28); stroke-width:1; }
+.map-scale text{ font:600 9px var(--zh); fill:rgba(255,244,230,.32); }
+
+.map-dot{ cursor:pointer; }
+.map-dot .halo{ fill:rgba(255,138,61,0); transition:fill .45s ease; }
+.map-dot .core{
+  fill:var(--glow);
+  opacity:0;
+  transform:scale(.2);
+  transform-box:fill-box;
+  transform-origin:center;
+  transition:opacity .55s var(--ease), transform .55s var(--ease), fill .3s ease;
+}
+.map-dot.is-on .core{ opacity:.85; transform:none; }
+
+.map-dot text{
+  font:600 10.5px var(--zh);
+  fill:var(--paper);
+  opacity:0;
+  transition:opacity .5s ease, fill .3s ease;
+}
+.map-dot.is-on text{ opacity:.5; }
+
+.map-dot.is-picked .core{ fill:var(--accent); opacity:1; }
+.map-dot.is-picked text{ opacity:1; fill:var(--accent); }
+.map-dot.is-picked .halo{ fill:rgba(255,138,61,.16); }
+.map-dot:hover .core{ fill:var(--accent); opacity:1; }
+
+.map-readout{
+  margin:6px 0 0;
+  min-height:1.4em;
+  font:600 12px/1 var(--round);
+  letter-spacing:.14em;
+  color:var(--glow);
+  opacity:.85;
+}
+
+.places{
+  display:flex; flex-wrap:wrap; gap:8px;
+  justify-content:center;
+  margin-top:16px;
+}
+.place{
+  font:600 12.5px/1 var(--zh);
+  color:var(--paper);
+  background:rgba(255,244,230,.06);
+  border:1px solid rgba(255,244,230,.1);
+  border-radius:999px;
+  padding:9px 13px;
+  cursor:pointer;
+  opacity:.62;
+  transition:opacity .25s ease, background .25s ease, border-color .25s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.place.is-on{ opacity:1; background:rgba(255,138,61,.16); border-color:rgba(255,138,61,.4); }
+
+.btn-random{
+  margin-top:26px;
+  font-family:var(--round);
+  font-weight:800;
+  font-size:14px;
+  letter-spacing:.05em;
+  color:var(--paper);
+  background:transparent;
+  border:2px solid rgba(255,244,230,.28);
+  border-radius:999px;
+  padding:13px 26px;
+  cursor:pointer;
+  transition:border-color .25s ease, background .25s ease, transform .15s var(--ease);
+}
+.btn-random:active{ transform:translateY(2px); background:rgba(255,244,230,.06); }
+
+/* 被"随便翻一天"翻到的那一天 */
+.moment.is-flash .photo{ animation:flashGlow 1.9s ease-out; }
+@keyframes flashGlow{
+  0%  { box-shadow:0 0 0 0 rgba(255,138,61,0), 0 18px 30px -18px rgba(6,3,12,.9); }
+  18% { box-shadow:0 0 0 6px rgba(255,138,61,.32), 0 18px 30px -18px rgba(6,3,12,.9); }
+  100%{ box-shadow:0 0 0 0 rgba(255,138,61,0), 0 18px 30px -18px rgba(6,3,12,.9); }
+}
 
 /* -------------------------------------------------------------
    收尾

@@ -255,6 +255,7 @@
 
       y.moments.forEach(function (m, mi) {
         var art = el('article', 'moment');
+        art.id = anchorId(y.year, m.date);
         var pics = m.photos || [];
 
         if (pics.length) {
@@ -270,6 +271,8 @@
             img.alt = p.alt || '';
             img.loading = 'lazy';
             img.decoding = 'async';
+            var sz = (window.PHOTO_SIZE || {})[p.src];
+            if (sz) { img.width = sz[0]; img.height = sz[1]; }
             fig.appendChild(img);
 
             fig.addEventListener('click', function () { openLightbox(p); });
@@ -294,6 +297,215 @@
 
       sec.appendChild(list);
       story.appendChild(sec);
+    });
+  }
+
+  /* ---------- 3.5 地图 ---------- */
+
+  var MAP = STORY.map;
+  var mapDots = [];
+  var mapPicked = -1;
+  var mapPlayed = false;
+  var mapSec = null;
+
+  var GEO = { lon0: 111.3, lon1: 117.4, lat0: 22.2, lat1: 25.2 };
+  var MAP_W = 520, MAP_H = 278;
+  var NS = 'http://www.w3.org/2000/svg';
+
+  function anchorId(y, d) { return 'm-' + y + '-' + String(d).replace(/\./g, ''); }
+
+  function proj(lon, lat) {
+    return [
+      (lon - GEO.lon0) / (GEO.lon1 - GEO.lon0) * MAP_W,
+      (GEO.lat1 - lat) / (GEO.lat1 - GEO.lat0) * MAP_H
+    ];
+  }
+
+  // 真正"瞬间"跳过去：behavior:'auto' 会继承 CSS 的 smooth，所以临时改掉
+  function jumpTo(target) {
+    var root = document.documentElement;
+    var prev = root.style.scrollBehavior;
+    root.style.scrollBehavior = 'auto';
+    target.scrollIntoView({ block: 'center' });
+    root.style.scrollBehavior = prev;
+  }
+
+  function svgEl(tag, attrs) {
+    var n = document.createElementNS(NS, tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) { n.setAttribute(k, attrs[k]); });
+    return n;
+  }
+
+  function buildMap() {
+    if (!MAP || !MAP.places || !MAP.places.length) return;
+    var mount = $('mapMount');
+    if (!mount) return;
+
+    var sec = el('section', 'mapsec');
+    sec.id = 'mapsec';
+    mapSec = sec;
+
+    sec.appendChild(el('h2', 'sticker map-title', MAP.title));
+    sec.appendChild(el('p', 'map-sub', MAP.sub));
+
+    var wrap = el('div', 'map-wrap');
+    var svg = svgEl('svg', { class: 'map-svg', viewBox: '0 0 ' + MAP_W + ' ' + MAP_H });
+
+    // 经纬网格
+    var grid = svgEl('g', { class: 'map-grid' });
+    for (var lon = 112; lon <= 117; lon++) {
+      var a = proj(lon, GEO.lat0), b = proj(lon, GEO.lat1);
+      grid.appendChild(svgEl('line', { x1: a[0], y1: a[1], x2: b[0], y2: b[1] }));
+    }
+    for (var lat = 22; lat <= 25; lat++) {
+      var c = proj(GEO.lon0, lat), d2 = proj(GEO.lon1, lat);
+      grid.appendChild(svgEl('line', { x1: c[0], y1: c[1], x2: d2[0], y2: d2[1] }));
+    }
+    svg.appendChild(grid);
+
+    // 图外的地方：顶上画一个箭头
+    (MAP.far || []).forEach(function (f) {
+      var x = proj(f.lon, GEO.lat1)[0];
+      var g = svgEl('g', { class: 'map-far' });
+      g.appendChild(svgEl('line', { x1: x, y1: 54, x2: x, y2: 12 }));
+      g.appendChild(svgEl('path', { d: 'M' + x + ' 3 l-5 9 h10 z' }));
+      var t1 = svgEl('text', { x: x + 9, y: 20 });
+      t1.textContent = f.name;
+      g.appendChild(t1);
+      var t2 = svgEl('text', { x: x + 9, y: 34, class: 'far-year' });
+      t2.textContent = f.year + ' · 出省';
+      g.appendChild(t2);
+      svg.appendChild(g);
+    });
+
+    // 点，按时间先后亮
+    var sorted = MAP.places.map(function (p, i) { return { p: p, i: i }; })
+      .sort(function (a, b) {
+        var ka = a.p.year + a.p.date, kb = b.p.year + b.p.date;
+        return ka < kb ? -1 : ka > kb ? 1 : a.i - b.i;
+      });
+
+    var layer = svgEl('g', { class: 'map-dots' });
+    sorted.forEach(function (item, order) {
+      var p = item.p;
+      var xy = proj(p.lon, p.lat);
+      var g = svgEl('g', { class: 'map-dot' });
+      g.setAttribute('tabindex', '0');
+      g.setAttribute('role', 'button');
+      g.setAttribute('aria-label', p.year + ' ' + p.name);
+
+      g.appendChild(svgEl('circle', { class: 'halo', cx: xy[0], cy: xy[1], r: 20 }));
+      g.appendChild(svgEl('circle', { class: 'core', cx: xy[0], cy: xy[1], r: 5.5 }));
+
+      var t = svgEl('text', {
+        x: xy[0] + (p.dx == null ? 9 : p.dx),
+        y: xy[1] + (p.dy == null ? 4 : p.dy),
+        'text-anchor': p.anchor || 'start'
+      });
+      t.textContent = p.name;
+      g.appendChild(t);
+
+      g.addEventListener('click', function () { pickPlace(item.i, true); });
+      g.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pickPlace(item.i, true); }
+      });
+
+      layer.appendChild(g);
+      mapDots[item.i] = { el: g, data: p, order: order };
+    });
+    svg.appendChild(layer);
+
+    // 指北针
+    var comp = svgEl('g', { class: 'map-compass' });
+    comp.appendChild(svgEl('path', { d: 'M500 22 l5 14 h-10 z' }));
+    var cn = svgEl('text', { x: 500, y: 46 });
+    cn.textContent = 'N';
+    comp.appendChild(cn);
+    svg.appendChild(comp);
+
+    // 比例尺：纬度 1 度约 111 公里
+    var pxPerDeg = MAP_H / (GEO.lat1 - GEO.lat0);
+    var bar = Math.round(pxPerDeg * (50 / 111));
+    var scale = svgEl('g', { class: 'map-scale' });
+    scale.appendChild(svgEl('line', { x1: 448, y1: MAP_H - 14, x2: 448 + bar, y2: MAP_H - 14 }));
+    scale.appendChild(svgEl('line', { x1: 448, y1: MAP_H - 18, x2: 448, y2: MAP_H - 10 }));
+    scale.appendChild(svgEl('line', { x1: 448 + bar, y1: MAP_H - 18, x2: 448 + bar, y2: MAP_H - 10 }));
+    var st = svgEl('text', { x: 448 + bar / 2, y: MAP_H - 22, 'text-anchor': 'middle' });
+    st.textContent = '50 km';
+    scale.appendChild(st);
+    svg.appendChild(scale);
+
+    wrap.appendChild(svg);
+    var ro = el('p', 'map-readout', '　');
+    ro.id = 'mapReadout';
+    wrap.appendChild(ro);
+    sec.appendChild(wrap);
+
+    var chips = el('div', 'places');
+    MAP.places.forEach(function (p, i) {
+      var b = el('button', 'place', p.name);
+      b.type = 'button';
+      b.addEventListener('click', function () { pickPlace(i, true); });
+      chips.appendChild(b);
+    });
+    sec.appendChild(chips);
+
+    var rb = el('button', 'btn-random', MAP.random || '随便翻一天');
+    rb.type = 'button';
+    rb.id = 'randBtn';
+    rb.addEventListener('click', randomPick);
+    sec.appendChild(rb);
+
+    mount.appendChild(sec);
+  }
+
+  function pickPlace(i, doScroll) {
+    var d = mapDots[i];
+    if (!d) return;
+    mapPicked = i;
+    mapDots.forEach(function (x) { if (x) x.el.classList.remove('is-picked'); });
+    d.el.classList.add('is-picked');
+
+    var ro = $('mapReadout');
+    if (ro) ro.textContent = d.data.year + ' · ' + d.data.name;
+    document.querySelectorAll('.place').forEach(function (c, k) {
+      c.classList.toggle('is-on', k === i);
+    });
+
+    if (!doScroll) return;
+    setTimeout(function () {
+      var target = document.getElementById(anchorId(d.data.year, d.data.date));
+      if (!target) return;
+      target.scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'center' });
+      target.classList.remove('is-flash');
+      void target.offsetWidth;
+      target.classList.add('is-flash');
+      setTimeout(function () { target.classList.remove('is-flash'); }, 2000);
+
+      // 平滑滚动在某些内核里不动，兜底直接跳过去
+      setTimeout(function () {
+        var r = target.getBoundingClientRect();
+        var vh = window.innerHeight || 800;
+        if (r.top > vh * 0.7 || r.bottom < vh * 0.3) jumpTo(target);
+      }, 900);
+    }, 480);
+  }
+
+  function randomPick() {
+    var n = (MAP.places || []).length;
+    if (!n) return;
+    var i = Math.floor(Math.random() * n);
+    if (n > 1 && i === mapPicked) i = (i + 1) % n;
+    pickPlace(i, true);
+  }
+
+  function mapAppear() {
+    if (mapPlayed) return;
+    mapPlayed = true;
+    mapDots.forEach(function (d) {
+      if (!d) return;
+      if (REDUCED) { d.el.classList.add('is-on'); return; }
+      setTimeout(function () { d.el.classList.add('is-on'); }, d.order * 130);
     });
   }
 
@@ -353,6 +565,11 @@
         watch.sections[i].classList.add('is-lit');
       }
     });
+
+    if (mapSec && !mapPlayed) {
+      var mr = mapSec.getBoundingClientRect();
+      if (mr.top < vh * 0.8 && mr.bottom > vh * 0.1) mapAppear();
+    }
   }
 
   function updateChip() {
@@ -719,6 +936,7 @@
   function init() {
     buildCover();
     buildYears();
+    buildMap();
     buildRail();
     setupFinale();
     setupGate();
