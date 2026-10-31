@@ -662,6 +662,7 @@
     treatBtn.textContent = F.treat;
     trickBtn.textContent = F.trick;
     $('envelopeHint').textContent = F.envelopeHint;
+    $('letterTo').textContent = tpl(F.letterTo || '{name}：');
 
     houseBtn.addEventListener('click', knockDoor);
     treatBtn.addEventListener('click', function () { pick('treat'); });
