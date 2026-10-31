@@ -308,7 +308,7 @@
   var mapPlayed = false;
   var mapSec = null;
 
-  var GEO = { lon0: 111.3, lon1: 117.4, lat0: 22.2, lat1: 25.2 };
+  var GEO = { lon0: 111.3, lon1: 117.4, lat0: 22.2, lat1: 25.4 };
   var MAP_W = 520, MAP_H = 278;
   var NS = 'http://www.w3.org/2000/svg';
 
@@ -327,6 +327,16 @@
     var prev = root.style.scrollBehavior;
     root.style.scrollBehavior = 'auto';
     target.scrollIntoView({ block: 'center' });
+    root.style.scrollBehavior = prev;
+  }
+
+  function goEnd() {
+    var t = mapSec || $('finale');
+    if (!t) return;
+    var root = document.documentElement;
+    var prev = root.style.scrollBehavior;
+    root.style.scrollBehavior = 'auto';
+    t.scrollIntoView({ block: 'start' });
     root.style.scrollBehavior = prev;
   }
 
@@ -363,18 +373,29 @@
     }
     svg.appendChild(grid);
 
-    // 图外的地方：顶上画一个箭头
+    // 图外的地方：图顶上标出来，点了也能跳过去
     (MAP.far || []).forEach(function (f) {
-      var x = proj(f.lon, GEO.lat1)[0];
+      var x = (f.x == null ? 0.5 : f.x) * MAP_W;
       var g = svgEl('g', { class: 'map-far' });
-      g.appendChild(svgEl('line', { x1: x, y1: 54, x2: x, y2: 12 }));
-      g.appendChild(svgEl('path', { d: 'M' + x + ' 3 l-5 9 h10 z' }));
-      var t1 = svgEl('text', { x: x + 9, y: 20 });
+      g.setAttribute('tabindex', '0');
+      g.setAttribute('role', 'button');
+      g.setAttribute('aria-label', f.year + ' ' + f.name);
+
+      var t1 = svgEl('text', { x: x + 8, y: 13 });
       t1.textContent = f.name;
       g.appendChild(t1);
-      var t2 = svgEl('text', { x: x + 9, y: 34, class: 'far-year' });
-      t2.textContent = f.year + ' · 出省';
+
+      var t2 = svgEl('text', { x: x + 8, y: 26, class: 'far-year' });
+      t2.textContent = f.year;
       g.appendChild(t2);
+
+      g.appendChild(svgEl('path', { d: 'M' + x + ' 32 l-5 9 h10 z' }));
+      g.appendChild(svgEl('line', { x1: x, y1: 41, x2: x, y2: 62 }));
+
+      g.addEventListener('click', function () { pickFar(f, g); });
+      g.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pickFar(f, g); }
+      });
       svg.appendChild(g);
     });
 
@@ -464,6 +485,7 @@
     if (!d) return;
     mapPicked = i;
     mapDots.forEach(function (x) { if (x) x.el.classList.remove('is-picked'); });
+    document.querySelectorAll('.map-far').forEach(function (x) { x.classList.remove('is-picked'); });
     d.el.classList.add('is-picked');
 
     var ro = $('mapReadout');
@@ -472,9 +494,25 @@
       c.classList.toggle('is-on', k === i);
     });
 
-    if (!doScroll) return;
+    if (doScroll) jumpToAnchor(d.data.year, d.data.date);
+  }
+
+  function pickFar(f, g) {
+    mapPicked = -1;
+    document.querySelectorAll('.map-dot').forEach(function (x) { x.classList.remove('is-picked'); });
+    document.querySelectorAll('.map-far').forEach(function (x) { x.classList.remove('is-picked'); });
+    document.querySelectorAll('.place').forEach(function (x) { x.classList.remove('is-on'); });
+    g.classList.add('is-picked');
+
+    var ro = $('mapReadout');
+    if (ro) ro.textContent = f.year + ' · ' + f.name;
+
+    jumpToAnchor(f.year, f.date);
+  }
+
+  function jumpToAnchor(year, date) {
     setTimeout(function () {
-      var target = document.getElementById(anchorId(d.data.year, d.data.date));
+      var target = document.getElementById(anchorId(year, date));
       if (!target) return;
       target.scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'center' });
       target.classList.remove('is-flash');
@@ -616,6 +654,24 @@
       updateChip();
 
       if (window.scrollY < vh * 0.6) yearChip.classList.remove('is-on');
+
+      // 从中间回到底部的按钮
+      var te = $('toEndBtn');
+      var onMap = false;
+      if (mapSec) {
+        var mr = mapSec.getBoundingClientRect();
+        onMap = mr.top < vh * 0.9 && mr.bottom > 0;
+      }
+      document.body.classList.toggle('on-map', onMap);
+
+      if (te) {
+        var showIt = window.scrollY > vh * 1.2 && !onMap;
+        if (showIt) {
+          var fin = $('finale');
+          if (fin && fin.getBoundingClientRect().top < vh) showIt = false;
+        }
+        te.classList.toggle('is-on', showIt);
+      }
     }
 
     requestAnimationFrame(run);
@@ -948,6 +1004,9 @@
 
     Sparks.init($('sparks'), T.particles || 'embers');
     syncSoundBtn();
+
+    var toEnd = $('toEndBtn');
+    if (toEnd) toEnd.addEventListener('click', goEnd);
 
     $('startBtn').addEventListener('click', function () {
       Sound.ensure();
